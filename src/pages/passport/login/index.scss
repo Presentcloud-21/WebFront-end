@@ -1,0 +1,42 @@
+$horizon-border:4%;
+$vertical-border:1%;
+
+
+.half-opacity {
+    opacity: 0.6;
+}
+.radio{
+    .radio-item {
+        color: white;
+    }
+    font-size: 18px;
+    margin: 5% auto;
+}
+.input {
+    margin:  $vertical-border $horizon-border;
+}
+.auto-login {
+    color: white;
+}
+.forget-password {
+    background-color:rgba(0,0,0,0.3);
+    color:white;
+}
+.login {
+    display: inline-flex;
+    margin-left: auto;
+    margin-right: auto;
+    background-color:rgba(0,0,0,0.3);
+    color:white;
+}
+.to-sign-up {
+    margin:  $vertical-border $horizon-border;
+    background-color:rgba(0,0,0,0.3);
+    color:white;
+    width: 100% - $horizon-border * 2;
+}
+.form {
+    width: 100% - $horizon-border * 2;
+    margin:$vertical-border auto;
+    // background-color: black;//用于检验区间
+}
