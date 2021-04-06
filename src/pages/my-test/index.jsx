@@ -1,35 +1,11 @@
 import React from 'react';
 import MyLayout from '../../component/my-layout'
 import {Button,Form,Radio} from 'antd';
-import axios from 'axios';
+import {Request} from '../../component/service/service'
 
 const {Item}=Form;
 
-axios.interceptors.request.use(
-  (config) => {
-    console.log('request',config);
-    return config;
-  },(error)=> {
-    console.log('request error',error);
-    return Promise.reject(error);
-  }
-)
 
-axios.interceptors.response.use(
-  (response)=>{
-    console.log('response suceess:',response);
-    return response;
-  },(error)=>{
-    const code=error.response.status;
-    console.log('response error:',code);
-    switch(code) {
-      case 404:window.location.href='/status404';break;
-      case 502:window.location.href='/status502';break;
-      case 504:window.location.href='/status504';break;
-    }
-    return Promise.reject(error);
-  }
-)
 
 class MyTest extends React.Component {
   constructor(props) {
@@ -38,26 +14,10 @@ class MyTest extends React.Component {
   }
 
   getUser = (e)=> {
-    console.log('in',e);
-    // fetch('/api/users').then( (res) => {
-    //    console.log("result is ",res);
-    //   return res.json();
-    // }).then( (data) => {
-    //   this.setState({users:data});
-    //   console.log(this.state);
-    // });
-    axios.post('/api/users',e).then((response) => {
-      console.log(response);
-      this.setState({users:response.data});
-      console.log('axios respond',this.state);
-      this.state.users.map((i)=>{ console.log(i); });
-    }).catch((err) => {
-      console.log('axios error:',err);
+    Request('POST','/api/users',e).then((response)=>{
+      const {data}=response;
+      this.setState({users:data});
     });
-    // axios.get('/api/users').then((response) => {
-    //   this.setState({users:response.data})
-    //   console.log(response);
-    // });
   }
 
   render() {
