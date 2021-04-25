@@ -51,8 +51,14 @@ class MySider extends React.Component {
           <Menu.Item key="/me" icon={<UserOutlined />}>
             <Link to='/me'>我的</Link>
           </Menu.Item>
-          <Menu.Item key="/list" icon={<UnorderedListOutlined />}>
-            <Link to='/list'>学生列表</Link>
+          <Menu.Item key="/student" icon={<UnorderedListOutlined />}>
+            <Link to='/student'>学生列表</Link>
+          </Menu.Item>
+          <Menu.Item key="/teacher" icon={<UnorderedListOutlined />}>
+            <Link to='/teacher'>教师列表</Link>
+          </Menu.Item>
+          <Menu.Item key="/class" icon={<UnorderedListOutlined />}>
+            <Link to='/class'>班课列表</Link>
           </Menu.Item>
         </Menu>
       </Sider>

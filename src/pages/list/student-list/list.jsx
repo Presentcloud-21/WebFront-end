@@ -57,7 +57,7 @@ class List extends React.Component {
         <Col>
           <Button type="link">
             <Link to={{pathname:'/edit-list',query:record}}>
-              编辑
+              详情
             </Link> 
             </Button>
         </Col>
@@ -83,6 +83,9 @@ class List extends React.Component {
             <Col>
               <Input className="search" placeholder={this.searchMessage[this.state['search-type']]} />
             </Col>
+            <Col>
+            <Button>查询</Button>
+            </Col>
           </Row>
         </Layout>
         <Layout className="list-contains" >
@@ -92,7 +95,7 @@ class List extends React.Component {
             </Col>
           </Row>
           <Row>
-            <Table bordered className="table" dataSource={this.list} >
+            <Table className="table" dataSource={this.list} >
               <Column title="学号" key="id" dataIndex="id" />
               <Column title="姓名" key="name" dataIndex="name"/>
               <Column title="联系方式" key="tel" dataIndex="tel" />

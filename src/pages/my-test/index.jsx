@@ -1,6 +1,6 @@
 import React from 'react';
 import MyLayout from '../../component/my-layout'
-import {Button,Form,Radio} from 'antd';
+import {Button,Form,Radio,Input} from 'antd';
 import {Request} from '../../component/service/service'
 
 const {Item}=Form;
@@ -14,12 +14,23 @@ class MyTest extends React.Component {
   }
 
   getUser = (e)=> {
-    Request('POST','/api/users',e).then((response)=>{
+    Request('POST','/ajax/users',e).then((response)=>{
       const {data}=response;
       this.setState({users:data});
     });
   }
 
+  sendMSG = (e)=> {
+    Request('POST','/ajax/sendMSG',e).then((response)=>{
+      const {data}=response;
+      this.setState({code:data});
+    });
+  }
+
+  onfinish = (e)=> {
+    this.getUser(e);
+    this.sendMSG(e);
+  }
   render() {
     return (
     <MyLayout>
@@ -27,7 +38,7 @@ class MyTest extends React.Component {
         <Form 
           name="users" 
           className="form"
-          onFinish={this.getUser}
+          onFinish={this.onfinish}
         >
           <Item name="mystatu">
             <Radio.Group>
@@ -37,9 +48,15 @@ class MyTest extends React.Component {
               <Radio value={504}>504</Radio>
             </Radio.Group>
           </Item>
-            <Item style={{marginLeft:"auto"}}>
-              <Button className="login" htmlType="submit" size="middle">发送</Button>
-            </Item>
+          <Item name="telephone">
+            <Input placeholder="电话号码"/>
+          </Item>
+          <Item name="vertication">
+            <Input placeholder="验证码"/>
+          </Item>
+          <Item style={{marginLeft:"auto"}}>
+            <Button className="login" htmlType="submit" size="middle">发送</Button>
+          </Item>
         </Form>
         {
           this.state.users.map((i)=>(

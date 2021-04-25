@@ -1,32 +1,96 @@
 import React from 'react';
 import LoginLayout from '../../../component/login-component/login-layout';
 import './index.scss'
-import { Row , Input , Radio , Checkbox , Button , Form} from 'antd'
-import { UserOutlined , LockOutlined } from '@ant-design/icons'
+import { Row ,Col, Input , Radio , Checkbox , Button , Form} from 'antd'
+import { UserOutlined , LockOutlined, MobileOutlined } from '@ant-design/icons'
+import { Request } from '../../../component/service/service';
 
 const { Item } = Form;
 
 class Login extends  React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    this.state=({
+      'LoginType':'password',
+      'alert':false,
+      'type':'',
+      'message':'',
+      'description':'',
+      'tel':''
+    });
   }
 
   onFinish = (values) =>  {
     console.log('Success:',values);
+    const path=this.state.LoginType === 'password'?'/ajax/login':'/ajax/loginbytel';
+    Request('POST',path,JSON.stringify(values)).then((response)=>{
+      const {data}=response;
+      console.log("Signup respond:",data);
+      if(data.success) {
+        this.setState({
+          'alert':true,
+          'type':'success',
+          'message':'登录成功',
+          'description':data.message
+        })
+        window.location.href='/home';
+      } else  {
+        this.setState({
+          'alert':true,
+          'type':'error',
+          'message':'登录失败',
+          'description':data.message
+        })
+      }
+    });
   }
 
   onFinishFail = (values) => {
     console.log('Fail',values);
   }
 
+  sendSms = (e) => {
+    console.log(e);
+    Request('GET','/ajax/loginsendSms?tel='+this.state.tel).then((response)=>{
+      const {data}=response;
+      if(data.success){
+        this.setState({
+          'alert':true,
+          'type':'success',
+          'message':'验证码发送成功'
+        })
+      } else {
+        this.setState({
+          'alert':true,
+          'type':'error',
+          'message':'验证码发送失败',
+          'description':data.message
+        })
+      }
+      console.log(data);
+    })
+  }
+
+  handleChange = (e)=> {
+    this.setState({
+      'tel':e.target.value
+    });
+  }
+
+  onLoginType = (e)=> {
+    console.log('login Type:',e.target.value);
+    this.setState({
+      'LoginType':e.target.value
+    });
+  }
+
   render() {
     return (
-    <LoginLayout>
+    <LoginLayout alert={this.state.alert} type={this.state.type} message={this.state.message} description={this.state.description}>
       <Row>
-        <Radio.Group className="radio" name="login-type"  defaultValue="username">
-          <Radio className="radio-item" value="username">用户名</Radio>
-          <Radio className="radio-item"value="telephone">电话号码</Radio>
-          <Radio className="radio-item" value="email">邮箱</Radio>
+        <Radio.Group className="radio" name="login-type" onChange={this.onLoginType}  defaultValue="password">
+          <Radio className="radio-item"value="password">密码登录</Radio>
+          <Radio className="radio-item" value="captcha">验证码登录</Radio>
         </Radio.Group>
       </Row>
       <Row>
@@ -37,19 +101,45 @@ class Login extends  React.Component {
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFail}
         >
-          <Item name="username" rules={[{ required: true, message: '请输入账号' }]}>
-            <Input className="half-opacity" size="large"  allowClear placeholder="账号" prefix={<UserOutlined />}/>
+          <Item name="tel" rules={[{ required: true, message: '请输入电话号码' }]}>
+            <Input value={this.state.tel} onChange={this.handleChange.bind(this)} className="half-opacity" size="large"  allowClear placeholder="用户名或电话号码" prefix={<UserOutlined />}/>
           </Item>
-          <Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
-            <Input.Password className="half-opacity" size="large"  allowClear placeholder="密码" prefix={<LockOutlined/>}/>
-          </Item>
-          <Item name="auto-login">
-            <Checkbox className="auto-login">自动登录</Checkbox>
-          </Item>
+          {
+            this.state.LoginType=='password'?
+            <div>
+              <Item name="userPassward" rules={[{ required: true, message: '请输入密码' }]}>
+                <Input.Password className="half-opacity" size="large"  allowClear placeholder="密码" prefix={<LockOutlined/>}/>
+              </Item>
+              <Item name="auto-login">
+                <Checkbox className="auto-login">自动登录</Checkbox>
+              </Item>
+            </div>
+              :
+              <Item>
+                <Row>
+                  <Col span={12}>
+                    <Item name="code"  rules={[{ required: true, message: '请输入验证码' }]} >
+                      <Input className="half-opacity" size="large" allowClear placeholder="验证码" prefix={<MobileOutlined />}/>
+                    </Item> 
+                  </Col>
+                  <Col span={6}>
+                    <Item>
+                      <Button className="captcha-button" onClick={this.sendSms}   size="large">发送验证码</Button>
+                    </Item>
+                  </Col>
+                </Row>
+              </Item>
+                
+              
+              
+          }
           <Row>
-            <Item name="forget-password">
+            {
+              this.state.LoginType=='password'?
+              <Item name="forget-password">
               <Button className="forget-password" size="middle">忘记密码</Button>
-            </Item>
+            </Item>:null
+            }
             <Item name="login" style={{marginLeft:"auto"}}>
               <Button className="login" htmlType="submit" size="middle">登录账号</Button>
             </Item>

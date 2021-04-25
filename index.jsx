@@ -13,13 +13,17 @@ import MyTest from './src/pages/my-test';
 import Statu404 from './src/pages/deal-statu/statu-404';
 import Statu502 from './src/pages/deal-statu/statu-502';
 import Statu504 from './src/pages/deal-statu/statu-504';
+import TeacherList from './src/pages/list/teacher-list';
+import ClassList from './src/pages/list/class-list';
 
 ReactDOM.render(
     <BrowserRouter>
         <Switch>
             <Route path='/home' component={Home} />
             <Route path='/me' component={Me} />
-            <Route path='/list' component={StudentList} />
+            <Route path='/student' component={StudentList} />
+            <Route path='/teacher' component={TeacherList} />
+            <Route path='/class' component={ClassList} />
             <Route path='/edit-list' component={EditList} />
             <Route path='/login' component={Login} />
             <Route path='/sign-up' component={SignUp} />

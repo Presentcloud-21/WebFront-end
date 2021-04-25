@@ -1,8 +1,10 @@
 import axios from 'axios';
 axios.interceptors.request.use(
     (config) => {
+      console.log('request success:',config);
       return config;
     },(error)=> {
+      console.log('request error:',error);
       return Promise.reject(error);
     }
   )
@@ -15,14 +17,14 @@ axios.interceptors.request.use(
       const code=error.response.status;
       console.log('response error:',code);
       switch(code) {
-        case 404:window.location.href='/status404';break;
-        case 502:window.location.href='/status502';break;
-        case 504:window.location.href='/status504';break;
+        // case 404:window.location.href='/status404';break;
+        // case 502:window.location.href='/status502';break;
+        // case 504:window.location.href='/status504';break;
       }
       return Promise.reject(error);
     }
   )
-
+  axios.defaults.headers.post['Content-Type']="application/json";
 export async function Request(method,target,data) {
     var info;
     method = method || 'POST';

@@ -94,9 +94,10 @@ module.exports = (env, argv) => {
         'Access-Control-Allow-Credentials': 'true',
       },
       proxy: {
-        '/api': {
-          target: 'http://127.1.0.0:8000',
-          // pathRewrite: {'^/api' : ''},
+        '/ajax': {
+          // target: 'http://127.1.0.0:8000',
+          target: 'http://192.168.43.210:8080',
+          pathRewrite: {'^/ajax' : ''},
           changeOrigin:true,
           secure:false,
         }

@@ -19,21 +19,29 @@ class EditList extends React.Component {
     return (
     <MyLayout>
       <Layout className="edit-contains" >
-        <Space direction="vertical" className="center" size="middle" align="end" >
+        <Space direction="vertical" className="center" size="middle" align="start" >
           <Row>
             <Col>学号:</Col>
+          </Row>
+          <Row>
             <Col><Input style={{width: 400}} placeholder={this.props.location.query?this.props.location.query.id:null} disabled/></Col>
           </Row>
           <Row>
             <Col>姓名:</Col>
+          </Row>
+          <Row>
             <Col><Input placeholder={this.props.location.query?this.props.location.query.name:null} style={{width: 400}}/></Col>
           </Row>
           <Row>
             <Col>电话号码:</Col>
+          </Row>
+          <Row>
             <Col><Input placeholder={this.props.location.query?this.props.location.query.tel:null} style={{width: 400}} /></Col>
           </Row>
           <Row>
             <Col>描述:</Col>
+          </Row>
+          <Row>
             <Col><Input.TextArea style={{width: 400}} /></Col>
           </Row>
           <Row>

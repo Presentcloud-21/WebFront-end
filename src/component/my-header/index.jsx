@@ -11,7 +11,12 @@ class MyHeader extends React.Component {
         <Col style={{color:"white"}}>
         </Col>
         <Col style={{marginLeft:"auto"}}>
-          <Avatar style={{top:0}} size={52} src="/assets/avata.png"  />
+          <Avatar style={{top:0}} size="middle" src="/assets/avata.png"  />
+        </Col>
+        <Col>
+          <p>
+            myname
+          </p>
         </Col>
       </Row>
     </Header>
