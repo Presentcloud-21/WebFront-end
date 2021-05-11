@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Menu } from 'antd'
+import { Layout, Menu ,Button } from 'antd'
 import  { Link } from 'react-router-dom';
 import {
   DesktopOutlined,
@@ -20,12 +20,14 @@ class MySider extends React.Component {
   state = {
     collapsed: false,
   };
-
   onCollapse = (collapsed) => {
     console.log(collapsed);
     this.setState({ collapsed });
   };
 
+  onSignout = () => {
+    window.location.href='/login'
+  }
   render() {
     const { collapsed } = this.state;
     // const pathname = window.location.hash.replace('#','');
@@ -61,6 +63,7 @@ class MySider extends React.Component {
             <Link to='/class'>班课列表</Link>
           </Menu.Item>
         </Menu>
+        <Button onClick={this.onSignout} style={{backgroundColor: 'crimson',width:'100%',color:'white'}}>退出登录</Button>
       </Sider>
   );
   }

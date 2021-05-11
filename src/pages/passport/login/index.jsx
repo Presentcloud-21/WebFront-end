@@ -1,8 +1,8 @@
 import React from 'react';
 import LoginLayout from '../../../component/login-component/login-layout';
 import './index.scss'
-import { Row ,Col, Input , Radio , Checkbox , Button , Form} from 'antd'
-import { UserOutlined , LockOutlined, MobileOutlined } from '@ant-design/icons'
+import { Row ,Spin,Col, Input , Radio , Checkbox , Button , Form} from 'antd'
+import { UserOutlined , LockOutlined, MobileOutlined,LoadingOutlined  } from '@ant-design/icons'
 import { Request } from '../../../component/service/service';
 
 const { Item } = Form;
@@ -16,8 +16,35 @@ class Login extends  React.Component {
       'type':'',
       'message':'',
       'description':'',
-      'tel':''
+      'tel':'',
+      'second':0
     });
+    const GithubCode=window.location.search.substring(6).split('&')[0];
+    console.log(GithubCode);
+    if(GithubCode != '') {
+      this.onGitHub(GithubCode);
+    }
+  }
+  timer='';
+
+  componentWillUnmount(){ 
+    clearInterval(this.timer);
+  }
+
+  onCount = (time) => {
+    let end_time = new Date().getTime() + time*1000;
+    var sys_second = (end_time - new Date().getTime());
+    this.timer = setInterval(()=> {
+      console.log('count',sys_second);
+      if(sys_second>=1000) {
+        sys_second -= 1000;
+        this.setState({
+          'second':Math.floor(sys_second/1000 % 60)
+        })
+      } else {
+        clearInterval(this.timer);
+      }
+    },1000);
   }
 
   onFinish = (values) =>  {
@@ -33,7 +60,7 @@ class Login extends  React.Component {
           'message':'登录成功',
           'description':data.message
         })
-        window.location.href='/home';
+        window.location.href='/class';
       } else  {
         this.setState({
           'alert':true,
@@ -49,15 +76,33 @@ class Login extends  React.Component {
     console.log('Fail',values);
   }
 
+  onGitHub = (code) => {
+   const login_request={
+      'client_id':'b585d1b6311c67f53731',
+      'client_secret':'0d6472eba7ae3ef595b785efa582f985528ca41a',
+      'code':code,
+    }
+    console.log('github');
+    const url1='https://github.com/login/oauth/access_token';
+    const url2='/ajax/callback'
+    // Request('GET',url2+"?code="+code).then((e)=>{
+    //   console.log('token:',e);
+    // });
+    Request('POST',url1,JSON.stringify(login_request)).then((e)=>{
+      console.log(e);
+    })
+  }
   sendSms = (e) => {
     console.log(e);
+    this.onCount(10);
     Request('GET','/ajax/loginsendSms?tel='+this.state.tel).then((response)=>{
       const {data}=response;
       if(data.success){
         this.setState({
           'alert':true,
           'type':'success',
-          'message':'验证码发送成功'
+          'message':'验证码发送成功',
+          'description':''
         })
       } else {
         this.setState({
@@ -124,7 +169,14 @@ class Login extends  React.Component {
                   </Col>
                   <Col span={6}>
                     <Item>
-                      <Button className="captcha-button" onClick={this.sendSms}   size="large">发送验证码</Button>
+                      {
+                        this.state.second == 0?
+                        <Button className="captcha-button" onClick={this.sendSms}   size="large">发送验证码</Button>
+                        :
+                        <Button disabled   size="large"><Spin indicator={<LoadingOutlined /> }>{this.state.second}</Spin></Button>
+
+
+                      }
                     </Item>
                   </Col>
                 </Row>
@@ -148,6 +200,10 @@ class Login extends  React.Component {
       </Row>
       <Button className="to-sign-up" href="sign-up" size="middle">没有账号？现在注册</Button>
       <Button className="to-sign-up" href="home" size="middle">游客模式(测试用)</Button>
+      <Button className="to-sign-up" 
+      onClick={this.onGitHub}
+      href="https://github.com/login/oauth/authorize?client_id=b585d1b6311c67f53731&redirect_uri=http://localhost:3001/login&scope=user&state=1"
+       size="middle">GitHub登录</Button>
     </LoginLayout>
   );
   }

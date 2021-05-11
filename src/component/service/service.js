@@ -17,6 +17,7 @@ axios.interceptors.request.use(
       const code=error.response.status;
       console.log('response error:',code);
       switch(code) {
+        case 401:window.location.href-'/login';break;
         // case 404:window.location.href='/status404';break;
         // case 502:window.location.href='/status502';break;
         // case 504:window.location.href='/status504';break;
