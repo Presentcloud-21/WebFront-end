@@ -3,6 +3,7 @@ import { Input, Layout, Select,Row,Col, Button, Table } from 'antd';
 import { Link } from 'react-router-dom';
 import { surnameArr, nameArr, phoneHeaderArr } from './name';
 import './index.scss'
+import { transformDirectionData } from '../../../component/service/direction-service';
 
 const { Option } = Select;
 const { Column } = Table;
@@ -88,9 +89,9 @@ class List extends React.Component {
               <Column title="工号" key="id" dataIndex="id" />
               <Column title="姓名" key="name" dataIndex="name"/>
               <Column title="年龄" key="age" dataIndex="age"/>
-              <Column title="性别" key="sex" dataIndex="sex"/>
+              <Column title="性别" key="sex" dataIndex="sex" render={(val)=>{return transformDirectionData(val,'sex');} } />
               <Column title="学校" key="school" dataIndex="school"/>
-              <Column title="专业" key="major" dataIndex="major"/>
+              <Column title="专业" key="major" dataIndex="major" render={(val)=>{return transformDirectionData(val,'major');} }/>
               <Column title="职称" key="position" dataIndex="position"/>
               <Column title="注册时间" key="time" dataIndex="time"/>
               <Column dataIndex="option" width={200} key="option" render={this.renderOption} />

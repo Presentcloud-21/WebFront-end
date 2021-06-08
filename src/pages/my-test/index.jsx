@@ -1,7 +1,8 @@
 import React from 'react';
 import MyLayout from '../../component/my-layout'
 import {Button,Form,Radio,Input} from 'antd';
-import {Request} from '../../component/service/service'
+import {Request} from '../../component/service/axios-service';
+import {transformDirectionData} from '../../component/service/direction-service';
 
 const {Item}=Form;
 
@@ -28,14 +29,32 @@ class MyTest extends React.Component {
   }
 
   onfinish = (e)=> {
-    this.getUser(e);
-    this.sendMSG(e);
+    // this.getUser(e);
+    // this.sendMSG(e);
+  }
+ 
+  onAdd = () => {
+    const res = transformDirectionData(this.state.value,this.state.code);
+    console.log("res is ",res);
+  }
+  onChangeValue = (e) => {
+    this.setState({
+      'value':e.target.value
+    })
+  }
+  onChangeCode = (e) => {
+    this.setState({
+      'code':e.target.value
+    })
   }
   render() {
     return (
     <MyLayout>
       <div>
-        <Form 
+        <Input placeholder="value" onChange={this.onChangeValue} />
+        <Input placeholder="code" onChange={this.onChangeCode} />
+        <Button onClick={this.onAdd}>添加</Button>
+        {/* <Form 
           name="users" 
           className="form"
           onFinish={this.onfinish}
@@ -62,7 +81,7 @@ class MyTest extends React.Component {
           this.state.users.map((i)=>(
             <li>{i.name}</li>
           ))
-        }
+        } */}
       </div>
       
     </MyLayout>

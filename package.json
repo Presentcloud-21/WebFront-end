@@ -29,6 +29,7 @@
     "http-proxy-middleware": "^1.1.0",
     "prop-types": "^15.7.2",
     "react": "^16.14.0",
+    "react-dnd": "^14.0.2",
     "react-dom": "^16.2.0",
     "react-localstorage": "^1.0.0",
     "react-router-dom": "^5.2.0",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@alifd/next-theme-loader": "^1.1.2",
+    "@ant-design/pro-form": "^1.27.1",
     "@commitlint/cli": "^7.2.1",
     "autoprefixer": "^6.3.6",
     "babel-cli": "^6.24.0",

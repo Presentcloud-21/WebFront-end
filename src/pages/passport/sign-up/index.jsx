@@ -3,7 +3,7 @@ import LoginLayout from '../../../component/login-component/login-layout';
 import './index.scss'
 import { Row , Input , Button , Form, Alert, Col} from 'antd'
 import { UserOutlined , LockOutlined , MailOutlined , MobileOutlined , LockFilled } from '@ant-design/icons'
-import { Request } from '../../../component/service/service';
+import { Request } from '../../../component/service/axios-service';
 
 const { Item } = Form;
 

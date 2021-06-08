@@ -3,7 +3,7 @@ import LoginLayout from '../../../component/login-component/login-layout';
 import './index.scss'
 import { Row ,Spin,Col, Input , Radio , Checkbox , Button , Form} from 'antd'
 import { UserOutlined , LockOutlined, MobileOutlined,LoadingOutlined  } from '@ant-design/icons'
-import { Request } from '../../../component/service/service';
+import { Request } from '../../../component/service/axios-service';
 
 const { Item } = Form;
 
@@ -60,7 +60,7 @@ class Login extends  React.Component {
           'message':'登录成功',
           'description':data.message
         })
-        window.location.href='/class';
+        window.location.href='/home';
       } else  {
         this.setState({
           'alert':true,
