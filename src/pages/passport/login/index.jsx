@@ -35,7 +35,6 @@ class Login extends  React.Component {
     let end_time = new Date().getTime() + time*1000;
     var sys_second = (end_time - new Date().getTime());
     this.timer = setInterval(()=> {
-      console.log('count',sys_second);
       if(sys_second>=1000) {
         sys_second -= 1000;
         this.setState({
@@ -60,7 +59,7 @@ class Login extends  React.Component {
           'message':'登录成功',
           'description':data.message
         })
-        window.location.href='/home';
+        // window.location.href='/home';
       } else  {
         this.setState({
           'alert':true,
@@ -93,9 +92,8 @@ class Login extends  React.Component {
     })
   }
   sendSms = (e) => {
-    console.log(e);
     this.onCount(10);
-    Request('GET','/ajax/loginsendSms?tel='+this.state.tel).then((response)=>{
+    Request('POST','/ajax/loginsendSms',JSON.stringify({'tel':this.state.tel})).then((response)=>{
       const {data}=response;
       if(data.success){
         this.setState({
@@ -127,6 +125,12 @@ class Login extends  React.Component {
     this.setState({
       'LoginType':e.target.value
     });
+  }
+
+  onLoginAdmin = (e) => {
+    window.localStorage.setItem('user',JSON.stringify({'name':'管理员','role':'0'}));
+    window.sessionStorage.setItem('user',JSON.stringify({'name':'管理员','role':'0'}));
+    window.location.href='/home';
   }
 
   render() {
@@ -199,7 +203,7 @@ class Login extends  React.Component {
         </Form>
       </Row>
       <Button className="to-sign-up" href="sign-up" size="middle">没有账号？现在注册</Button>
-      <Button className="to-sign-up" href="home" size="middle">游客模式(测试用)</Button>
+      <Button className="to-sign-up" onClick={this.onLoginAdmin} size="middle">游客模式(测试用)</Button>
       <Button className="to-sign-up" 
       onClick={this.onGitHub}
       href="https://github.com/login/oauth/authorize?client_id=b585d1b6311c67f53731&redirect_uri=http://localhost:3001/login&scope=user&state=1"

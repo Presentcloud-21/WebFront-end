@@ -17,18 +17,19 @@ import TeacherList from './src/pages/list/teacher-list';
 import ClassList from './src/pages/list/class-list';
 import DataDirection from './src/pages/data-direction';
 import SystemParam from './src/pages/system-param';
+import PrivaryRoute from './src/component/privary-route';
 
 ReactDOM.render(
     <BrowserRouter>
         <Switch>
-            <Route path='/home' component={Home} />
-            <Route path='/me' component={Me} />
-            <Route path='/student' component={StudentList} />
-            <Route path='/teacher' component={TeacherList} />
-            <Route path='/class' component={ClassList} />
-            <Route path='/direction' component={DataDirection} />
-            <Route path='/system-param' component={SystemParam} />
-            <Route path='/edit-list' component={EditList} />
+            <PrivaryRoute path='/home' component={Home} />
+            <PrivaryRoute path='/me' component={Me} />
+            <PrivaryRoute path='/student' component={StudentList} />
+            <PrivaryRoute path='/teacher' component={TeacherList} />
+            <PrivaryRoute path='/class' component={ClassList} />
+            <PrivaryRoute path='/direction' component={DataDirection} />
+            <PrivaryRoute path='/system-param' component={SystemParam} />
+            <PrivaryRoute path='/edit-list' component={EditList} />
             <Route path='/login' component={Login} />
             <Route path='/sign-up' component={SignUp} />
             <Route path='/test' component={MyTest} />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Input,Form, Radio, Select,Row,Col, Button, Table, Modal ,Popconfirm, InputNumber } from 'antd';
+import { Input,Form,Tag, Cascader ,Radio, Select,Row,Col, Button, Table, Modal ,Popconfirm, InputNumber } from 'antd';
 import { Link } from 'react-router-dom';
 import './index.scss'
 import { Request } from '../../component/service/axios-service';
@@ -13,13 +13,35 @@ const ISDEFAULT = {"0":"否","1":"是"};
 class List extends React.Component {
   constructor(props) {
     super(props);
+    console.log('list',props);
     let max=0;
     this.state={
       "code":props.code,
       "id":props.id,
-      'hasChange':false
+      'pId':props.pId,
+      'hasChange':false,
+      'list':[]
     };
-    Request('GET','/ajax/dictionary/dictionarydetail/'+props.code).then((response)=>{
+    this.onInit();
+  }
+
+  onInit = ()=>{
+    if(this.state.pId!=0) {
+      Request('GET','/ajax/dictionary/dictionarydetailbyid/'+this.state.pId).then((response)=>{
+      const {data}=response;
+      console.log('pId',data);
+      let json=[];
+      data.map((i)=>{
+        json["_"+String(i.dictionaryDetailId)] = i.itemValue;
+      });
+      console.log('json',json);
+      this.setState({
+        'plist':data,
+        'transfrom':json
+      });
+    });
+    }
+    Request('GET','/ajax/dictionary/dictionarydetailbycode/'+this.state.code).then((response)=>{
       const {data}=response;
       this.setState({
         'list':data
@@ -35,8 +57,34 @@ class List extends React.Component {
     });
   }
 
+  componentWillReceiveProps(props) {
+    console.log('mount',props);
+    this.state={
+      "code":props.code,
+      "id":props.id,
+      'pId':props.pId,
+      'hasChange':false,
+      'list':[]
+    };
+    this.onInit();
+  }
+
+  onGetOption = (list) => {
+    if(list == null) return null;
+    let res=[];
+    for(let i=0;i<list.length;++i) {
+      const data={'value':list[i].dictionaryDetailId,'label':list[i].itemValue}
+      res.push(data);
+    }
+    console.log('option',res);
+    return res;
+  }
+
   renderOption  = (text,record,index) => {
     return(
+      this.state.list[index].updateflag == STATE.delete?
+      <Tag color="error">已删除</Tag>
+      :
       <Row>
         <Col>
           <Button type="link" onClick={()=>{this.onEditDirectionData(index)}}>
@@ -50,12 +98,7 @@ class List extends React.Component {
           cancelText="取消"
           onConfirm={()=>{
           console.log("text: ",text);console.log("record: ",record);console.log("index: ",index);
-          let list=[...this.state.list];
-          list.splice(index,index+1);
-          this.setState({
-          'hasChange':true,
-          'list':list,
-        });
+          this.onDelete(index);
         }}>
           <Button type="link">删除</Button>
           </Popconfirm>
@@ -99,15 +142,20 @@ class List extends React.Component {
   }
 
   onDelete = (index)=> {
-    console.log('delete');
-    let list=[...list];
-    list[index].updateflag=STATE['delete'];
+    let list=[...this.state.list];
+    console.log('delete',index);
+    list[index].updateflag=STATE.delete;
     this.setState({
-      'list':list
+      'list':list,
+      'hasChange':true
     });
   }
 
   onAdd = (e,callback) => {
+    const l=e.detailpId;
+    if(l!=null) {
+      e.detailpId=l[l.length-1];
+    }
     console.log('onAdd',e);
     if(e.isdefault==1) {
       this.resetDefault(-1);
@@ -130,6 +178,8 @@ class List extends React.Component {
   }
   
   onAddDirectionData = ()=>{
+    const option = this.onGetOption(this.state.plist);
+    console.log('super plist',option);
     const modal = Modal.confirm();
     const destroy =  ()=> {
       modal.destroy();
@@ -146,14 +196,24 @@ class List extends React.Component {
         <Form
           onFinish={(e)=>this.onAdd(e,destroy)}
         >
-          <p>数据编号</p>
+          数据编号
           <Form.Item name="itemKey" rules={[{validator:this.validKey}]} >
             <InputNumber  placeholder={this.state.keynum+1}/>
           </Form.Item>
-          <p>数据名称</p>
+          数据名称
           <Form.Item name="itemValue" rules={[{ required: true, message: '字典名称不能为空' },{validator:this.validValue}]}> 
             <Input />
           </Form.Item>
+          {
+            this.state.pId==0?null:
+            <div>
+          请选择上级明细
+          <Form.Item name="detailpId" rules={[{ required: true, message: '上级明细不能为空' }]} >
+          <Cascader options={option} onChange={(e)=>{console.log(e);}} placeholder="请选择上级明细" />
+          </Form.Item>
+            </div>
+          }
+          
           <Form.Item name="isdefault">
             <Radio.Group initialValue={0}>
               <Radio value={1}>是否默认</Radio>
@@ -162,6 +222,7 @@ class List extends React.Component {
           <Form.Item name="updateflag" initialValue={STATE.add}></Form.Item>
           <Form.Item name="dictionaryId" initialValue={this.state.id}></Form.Item>
           <Form.Item name="dictionaryCode" initialValue={this.state.code}></Form.Item>
+          <Form.Item name="dictionaryCode" initialValue={0}></Form.Item>
           <Button type="primary" htmlType="submit">提交</Button>
           <Button type="danger" onClick={()=>{modal.destroy()}}>取消</Button>
         </Form>
@@ -203,11 +264,11 @@ class List extends React.Component {
         <Form
           onFinish={(e)=>this.onEdit(e,index,destroy)}
         >
-          <p>数据编号</p>
+          数据编号
           <Form.Item name="itemKey" initialValue={data.itemKey}>
             <InputNumber  value={data.itemKey} disabled/>
           </Form.Item>
-          <p>数据名称</p>
+          数据名称
           <Form.Item name="itemValue" initialValue={data.itemValue} rules={[{validator:(rule,value,callback)=>this.validValue(rule,value,callback,data.itemKey)}]}> 
             <Input placeholder={data.itemValue} />
           </Form.Item>
@@ -233,6 +294,7 @@ class List extends React.Component {
     })
     Request('POST','/ajax/dictionary/updatedictionary',JSON.stringify(this.state.list)).then((response)=>{
       console.log('add new type',response);
+      // window.location.reload();
     })
   }
 
@@ -252,6 +314,12 @@ class List extends React.Component {
             <Column title="数据名称" key="name" dataIndex="itemValue"/>
             {/* <Column title="关键字" key="keyname" dataIndex="dictionaryCode"/> */}
             <Column title="默认值" key="default" dataIndex="isdefault" render={ (value)=>{ return ISDEFAULT[value]} }/>
+            {
+              this.state.pId == 0?null:
+              <Column title="所属" key="detailpId" dataIndex="detailpId"
+              render={(value)=>{return this.state.transfrom["_"+String(value)]}} 
+              />
+            }
             <Column dataIndex="option" width={200} key="option" render={this.renderOption} />
           </Table>
         </Col>

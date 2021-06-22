@@ -53,9 +53,8 @@ class SignUp extends  React.Component {
     });
   }
 
-  sendSms = (e) => {
-    console.log(e);
-    Request('GET','/ajax/signupsendSms?tel='+this.state.tel).then((response)=>{
+  sendSms = () => {
+    Request('POST','/ajax/signupsendSms',JSON.stringify({"tel":this.state.tel})).then((response)=>{
       const {data}=response;
       console.log(data);
     })

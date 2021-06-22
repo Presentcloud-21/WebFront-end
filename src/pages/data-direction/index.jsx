@@ -1,18 +1,22 @@
 import React, { Children } from 'react';
 import MyLayout from '../../component/my-layout';
 import List from './list';
-import { Row, Col, Menu, Button, Modal, Form, Input} from 'antd'
+import { Cascader,Row, Col, Menu, Button, Modal, Form, Input} from 'antd'
 import {PlusOutlined} from '@ant-design/icons'
 import './index.scss'
 import { Request } from '../../component/service/axios-service';
 const initList=[];
+const { SubMenu } = Menu;
+const { Item } = Menu;
+
 class DataDirection extends React.Component {
   constructor(props) {
     super(props);
     this.state={
-      'selected_key':"sex",
+      'selected_key':0,
+      'selected_code':'',
+      'selected_pId':0,
       'list':[],
-      'visible':false,
     };
     Request('GET','/ajax/dictionary').then((response)=>{
       console.log(response);
@@ -22,32 +26,72 @@ class DataDirection extends React.Component {
       });
     });
   }
+  componentDidUpdate() {
+    console.log('selected key',this.state.selected_key);
 
-  onAddDirectionType = ()=>{
-    this.setState({
-      'visible':true
-    });
   }
 
-
-  onSelectType = (e)=>{
-    this.setState({
-      'selected_key':e.item.props.name
-    });
-    console.log(this.state.selected_key);
+  onSelectType = (e,list)=>{
+    for(let i = 0;i <list.length && this.state.selected_key!=e.key;++i) {
+      if(list[i].dictionaryId == e.key) {
+        this.setState({
+          'selected_key':e.key,
+          'selected_code':list[i].dictionaryCode,
+          'selected_pId':list[i].pId,
+        });
+      }
+      if(list[i].child!=null) {
+        this.onSelectType(e,list[i].child);
+      }
+    }
   }
   
-  onSave = (e) => {
+  onSave = (e,callback) => {
+    const list = e.pId;
+    for(let i=list.length-1;i>=0;--i) {
+      if(list[i]==0) {
+        if(i!=0) continue;
+      }
+      e.pId=list[i];
+      break;
+    }
+    console.log(e,typeof e.pId);
     Request('POST','/ajax/dictionary/adddic/',JSON.stringify(e)).then((response)=>{
       console.log('add new type',response);
+      callback();
       window.location.reload();
     })
   }
-  onCancel = ()=>{
-    this.setState({
-      'visible':false
-    })
+
+  onGetOption = (list) => {
+    if(list == null) return null;
+    let res=[{'value':0,'label':'无'}];
+    for(let i=0;i<list.length;++i) {
+      const data={'value':list[i].dictionaryId,'label':list[i].dictionaryDescribe,'children':this.onGetOption(list[i].child)}
+      res.push(data);
+    }
+    console.log('option',res);
+    return res;
   }
+
+  onGetMenu = (data) => {
+    console.log(data);
+    return (
+      data.child==null?
+      <Item key={data.dictionaryId} onClick={(e)=>{console.log(e);}} title={data.dictionaryDescribe}>{data.dictionaryDescribe}</Item>
+      :
+      <SubMenu  title={data.dictionaryDescribe}>
+        <Item key={data.dictionaryId} onClick={(e)=>{console.log(e);}} title={data.dictionaryDescribe}>{data.dictionaryDescribe}</Item>
+        {
+          data.child.map((i)=>{
+            return this.onGetMenu(i)
+          })
+        }
+      </SubMenu>
+    );
+  }
+
+
 
   validDescribe = (rule, value, callback) => {
     console.log('v',value);
@@ -69,6 +113,44 @@ class DataDirection extends React.Component {
     callback(); // 校验通过
   }
 
+  onAddDirectionType = ()=>{
+    const option = this.onGetOption(this.state.list);
+    console.log(option);
+    const modal = Modal.confirm();
+    const destroy =  ()=> {
+      modal.destroy();
+    }
+    modal.update({
+      title:'新增字典类型',
+      okText:'新增',
+      cancelText:'取消',
+      destroyOnClose:true,
+      okButtonProps:{style:{'display':'none'}},
+      cancelButtonProps:{style:{'display':'none'}},
+      footer:null,
+      content: (
+        <Form
+          onFinish={(e)=>this.onSave(e,destroy)}
+        >
+          字典名称
+          <Form.Item name="dictionaryDescribe" rules={[{ required: true, message: '字典名称不能为空' },{validator:this.validDescribe}]}  >
+            <Row><Input name="describe" className="direction-input" /></Row>
+          </Form.Item>
+          字典关键字
+          <Form.Item name="dictionaryCode"  rules={[{ required: true, message: '字典关键字不能为空' },{validator:this.validCode}]} >
+            <Row><Input name="code" className="direction-input" /></Row>
+          </Form.Item>
+          请选择上级菜单
+          <Form.Item name="pId" initialValue={[0]}>
+          <Cascader options={option} onChange={(e)=>{console.log(e);}} placeholder="请选择上级菜单" />
+          </Form.Item>
+          <Button type="primary" htmlType="submit">提交</Button>
+          <Button type="danger" className="modal_cancel" onClick={()=>{modal.destroy()}}>取消</Button>
+        </Form>
+      )
+    });
+  }
+
   render() {
     return (
     <MyLayout>
@@ -77,44 +159,19 @@ class DataDirection extends React.Component {
         <p className="direction-title"><strong>数据字典类型</strong></p>
         <Menu theme="light"
           mode="inline"
+          onClick={(e)=>{this.onSelectType(e,this.state.list)}}
           >
           {
             this.state.list.map((i)=>{
-              return <Menu.Item name={i.dictionaryCode} onClick={this.onSelectType} className="direction-type">{i.dictionaryDescribe}</Menu.Item>
+              return this.onGetMenu(i)
             })
           }
         </Menu>
         <Button type='danger' onClick={this.onAddDirectionType} style={{width:'100%',color:'white'}} >添加字典类型 <PlusOutlined/></Button>
-        <Modal
-         title="添加数据"
-         visible={this.state.visible}
-         footer={null}
-        >
-          <Form
-            onFinish={this.onSave}
-            validateTrigger="onBlur"
-          >
-            <Row>字典名称</Row>
-            <Form.Item name="dictionaryDescribe" rules={[{ required: true, message: '字典名称不能为空' },{validator:this.validDescribe}]}  >
-              <Row><Input name="describe" className="direction-input" /></Row>
-            </Form.Item>
-            <Row> 字典关键字</Row>
-            <Form.Item name="dictionaryCode"  rules={[{ required: true, message: '字典关键字不能为空' },{validator:this.validCode}]} >
-              <Row><Input name="code" className="direction-input" /></Row>
-            </Form.Item>
-            <Row>
-              <Col><Button type="primary" htmlType="submit" >提交</Button></Col>
-              <Col><Button type="danger" onClick={this.onCancel} style={{marginLeft:'24px'}}>取消</Button></Col>
-            </Row>
-          </Form>
-        </Modal>
       </Col>
       <Col className="direction-contains">
         {
-          this.state.list.map((i)=> {
-            console.log(i.list)
-            return i.dictionaryCode === this.state.selected_key ?   <List code={i.dictionaryCode} id={i.dictionaryId} /> : null
-          })
+          this.state.selected_key==0?null:<List code={this.state.selected_code} id={this.state.selected_key} pId={this.state.selected_pId} />
         }
       </Col>
       </Row>

@@ -1,89 +1,39 @@
 import React from 'react';
 import MyLayout from '../../component/my-layout'
-import {Button,Form,Radio,Input} from 'antd';
+import {Button,Form,Table,Cascader,Radio,Input} from 'antd';
 import {Request} from '../../component/service/axios-service';
 import {transformDirectionData} from '../../component/service/direction-service';
+import { sortableContainer, sortableElement, sortableHandle } from 'react-sortable-hoc';
+import { MenuOutlined } from '@ant-design/icons';
 
 const {Item}=Form;
-
-
+const {Column} = Table;
 
 class MyTest extends React.Component {
   constructor(props) {
     super(props);
-    this.state={ count:1,users:[]};
   }
 
-  getUser = (e)=> {
-    Request('POST','/ajax/users',e).then((response)=>{
-      const {data}=response;
-      this.setState({users:data});
-    });
-  }
-
-  sendMSG = (e)=> {
-    Request('POST','/ajax/sendMSG',e).then((response)=>{
-      const {data}=response;
-      this.setState({code:data});
-    });
-  }
-
+ 
   onfinish = (e)=> {
-    // this.getUser(e);
-    // this.sendMSG(e);
+    Request('GET','ajax/getusermessage/'+e.tel).then((response)=>{
+      console.log(response);
+    })
+
   }
  
-  onAdd = () => {
-    const res = transformDirectionData(this.state.value,this.state.code);
-    console.log("res is ",res);
-  }
-  onChangeValue = (e) => {
-    this.setState({
-      'value':e.target.value
-    })
-  }
-  onChangeCode = (e) => {
-    this.setState({
-      'code':e.target.value
-    })
-  }
+
   render() {
     return (
     <MyLayout>
-      <div>
-        <Input placeholder="value" onChange={this.onChangeValue} />
-        <Input placeholder="code" onChange={this.onChangeCode} />
-        <Button onClick={this.onAdd}>添加</Button>
-        {/* <Form 
-          name="users" 
-          className="form"
-          onFinish={this.onfinish}
-        >
-          <Item name="mystatu">
-            <Radio.Group>
-              <Radio value={200}>200</Radio>
-              <Radio value={404}>404</Radio>
-              <Radio value={502}>502</Radio>
-              <Radio value={504}>504</Radio>
-            </Radio.Group>
-          </Item>
-          <Item name="telephone">
-            <Input placeholder="电话号码"/>
-          </Item>
-          <Item name="vertication">
-            <Input placeholder="验证码"/>
-          </Item>
-          <Item style={{marginLeft:"auto"}}>
-            <Button className="login" htmlType="submit" size="middle">发送</Button>
-          </Item>
-        </Form>
-        {
-          this.state.users.map((i)=>(
-            <li>{i.name}</li>
-          ))
-        } */}
-      </div>
-      
+      <Form
+      onFinish={this.onfinish}
+      >
+        <Item name='tel'>
+          <Input placeholder="请输入电话号码" />
+        </Item>
+        <Button htmlType="submit" >测试</Button>
+      </Form>
     </MyLayout>
   );
   }
