@@ -54,7 +54,8 @@ class SignUp extends  React.Component {
   }
 
   sendSms = () => {
-    Request('POST','/ajax/signupsendSms',JSON.stringify({"tel":this.state.tel})).then((response)=>{
+    console.log(typeof(this.state.tel));
+    Request('POST','/ajax/signupsendSms/'+this.state.tel,JSON.stringify({})).then((response)=>{
       const {data}=response;
       console.log(data);
     })
@@ -92,12 +93,6 @@ class SignUp extends  React.Component {
                   </Col>
                 </Row>
               </Item>
-          <Item name="email" rules={[
-            { required: true, message: '请输入邮箱' },
-            { pattern: /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,message: '邮箱格式错误'}
-            ]} >
-              <Input className="half-opacity" size="large" allowClear placeholder="邮箱" prefix={<MailOutlined />}/>
-          </Item>
           <Item name="userPassward" hasFeedback rules={[{ required: true, message: '请输入密码' }]}>
             <Input.Password className="half-opacity" size="large"  allowClear placeholder="设置密码" prefix={<LockOutlined/>}/>
           </Item>

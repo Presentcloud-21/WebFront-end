@@ -3,7 +3,7 @@ import LoginLayout from '../../../component/login-component/login-layout';
 import './index.scss'
 import { Row ,Spin,Col, Input , Radio , Checkbox , Button , Form} from 'antd'
 import { UserOutlined , LockOutlined, MobileOutlined,LoadingOutlined  } from '@ant-design/icons'
-import { Request } from '../../../component/service/axios-service';
+import { AddToken, Request } from '../../../component/service/axios-service';
 
 const { Item } = Form;
 
@@ -57,15 +57,16 @@ class Login extends  React.Component {
           'alert':true,
           'type':'success',
           'message':'登录成功',
-          'description':data.message
+          'description':data.msg
         })
-        // window.location.href='/home';
+        AddToken(data.token);
+        this.onLogin(this.state.tel);
       } else  {
         this.setState({
           'alert':true,
           'type':'error',
           'message':'登录失败',
-          'description':data.message
+          'description':data.msg
         })
       }
     });
@@ -93,7 +94,7 @@ class Login extends  React.Component {
   }
   sendSms = (e) => {
     this.onCount(10);
-    Request('POST','/ajax/loginsendSms',JSON.stringify({'tel':this.state.tel})).then((response)=>{
+    Request('GET','/ajax/loginsendSms/'+this.state.tel).then((response)=>{
       const {data}=response;
       if(data.success){
         this.setState({
@@ -126,7 +127,14 @@ class Login extends  React.Component {
       'LoginType':e.target.value
     });
   }
-
+  onLogin = (tel) => {
+    Request('GET','/ajax/getusermessage/'+tel).then((response)=>{
+      console.log('user data',response);
+      const {data}=response.data;
+      window.sessionStorage['user'] = JSON.stringify(data);
+      window.location.href="/home";
+    });
+  }
   onLoginAdmin = (e) => {
     window.localStorage.setItem('user',JSON.stringify({'name':'管理员','role':'0'}));
     window.sessionStorage.setItem('user',JSON.stringify({'name':'管理员','role':'0'}));

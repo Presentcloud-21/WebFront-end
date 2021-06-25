@@ -1,24 +1,40 @@
 import './config'
-const sexdata={
-    "0":"男",
-    "1":"女",
-    "2":"未知"
-}
-const majordata={
-    "0":"计算机",
-    "1":"机械",
-    "2":"电气"
-}
-const total = {
-    "sex":sexdata,
-    "major":majordata
-}
-let list = {};
+import { Request } from './axios-service';
+let direction={};
 
-export function transformDirectionData(value,code) {
-    console.log(total[code]);
-    if(!list.hasOwnProperty(code)) {
-        list[code]=total[code];
+export  function transformDirectionData(value,code) {
+    if(!direction[code]) {
+        direction[code]=JSON.parse(window.sessionStorage.getItem(code));
     }
-    return list[code][value];
+    if(value==undefined || value==null) {
+        return direction[code]['default'];
+    }
+    return direction[code]["_"+String(value)];
+}
+
+export function hasDirectionKey(code) {
+    return window.sessionStorage.getItem(code)!=null;
+}
+
+export function getDirection() {
+    Request('GET','/ajax/dictionary').then((response)=>{
+        const {data}=response.data;
+        addDirection(data);
+      });
+}
+function addDirection(list) {
+    list.map((i)=>{
+        Request('GET','/ajax/dictionary/dictionarydetailbycode/'+i.dictionaryCode).then((response)=>{
+            const {data}=response.data;
+            let dire={};
+            for(let i=0;i<data.length;++i) {
+                dire["_"+String(data[i].itemKey)]=data[i].itemValue;
+                if(data[i].isdefault==1) dire['default']=data[i].itemValue;
+            }
+            window.sessionStorage.setItem(i.dictionaryCode,JSON.stringify(dire));
+            if(i.child) {
+                addDirection(i.child);
+            }
+          });
+    });
 }

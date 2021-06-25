@@ -5,6 +5,7 @@ import { Cascader,Row, Col, Menu, Button, Modal, Form, Input} from 'antd'
 import {PlusOutlined} from '@ant-design/icons'
 import './index.scss'
 import { Request } from '../../component/service/axios-service';
+import { getDirection } from '../../component/service/direction-service';
 const initList=[];
 const { SubMenu } = Menu;
 const { Item } = Menu;
@@ -20,12 +21,13 @@ class DataDirection extends React.Component {
     };
     Request('GET','/ajax/dictionary').then((response)=>{
       console.log(response);
-      const {data}=response;
+      const {data}=response.data;
       this.setState({
         'list':data
       });
     });
   }
+  
   componentDidUpdate() {
     console.log('selected key',this.state.selected_key);
 

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import './index.scss'
 import { Request } from '../../component/service/axios-service';
 import {DndProvider} from 'react-dnd'
+import { getDirection } from '../../component/service/direction-service';
 const { Option } = Select;
 const { Column } = Table;
 
@@ -14,7 +15,6 @@ class List extends React.Component {
   constructor(props) {
     super(props);
     console.log('list',props);
-    let max=0;
     this.state={
       "code":props.code,
       "id":props.id,
@@ -26,6 +26,7 @@ class List extends React.Component {
   }
 
   onInit = ()=>{
+    let max=0;
     if(this.state.pId!=0) {
       Request('GET','/ajax/dictionary/dictionarydetailbyid/'+this.state.pId).then((response)=>{
       const {data}=response;
@@ -59,13 +60,13 @@ class List extends React.Component {
 
   componentWillReceiveProps(props) {
     console.log('mount',props);
-    this.state={
+    this.setState({
       "code":props.code,
       "id":props.id,
       'pId':props.pId,
       'hasChange':false,
       'list':[]
-    };
+    });
     this.onInit();
   }
 
@@ -229,7 +230,9 @@ class List extends React.Component {
       )
     });
   }
-
+  componentDidMount() {
+    getDirection();
+  }
   onEdit = (e,index,callback)=> {
     console.log('edit',e);
     console.log('index',index);
@@ -294,7 +297,7 @@ class List extends React.Component {
     })
     Request('POST','/ajax/dictionary/updatedictionary',JSON.stringify(this.state.list)).then((response)=>{
       console.log('add new type',response);
-      // window.location.reload();
+      window.location.reload();
     })
   }
 

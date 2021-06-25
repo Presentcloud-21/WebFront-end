@@ -10,6 +10,7 @@
   "proxy": "http://192.168.1.170",
   "scripts": {
     "start": "webpack-dev-server --mode development  --port 3001",
+    "server":"live-server ./ --host=192.168.1.207 --port=3001",
     "build": "webpack --mode production",
     "lint": "eslint . --ext '.js,.jsx' --fix",
     "prettier": "prettier src/**/*.scss --write"

@@ -11,7 +11,7 @@ class List extends React.Component {
       'list':[]
     }
     Request('GET','/ajax/syspara').then((response)=>{
-      const {data}=response;
+      const {data}=response.data;
       console.log('mydata1',data);
       this.setState({
         'list':data

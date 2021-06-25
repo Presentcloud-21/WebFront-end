@@ -21,12 +21,8 @@ import {
       "name":"我的",
       "icon":<UserOutlined />
   },{
-    "url":"/student",
-    "name":"学生列表",
-    "icon":<SmileOutlined />
-},{
-    "url":"/teacher",
-    "name":"教师列表",
+    "url":"/user",
+    "name":"用户列表",
     "icon":<AuditOutlined />
 },{
     "url":"/class",

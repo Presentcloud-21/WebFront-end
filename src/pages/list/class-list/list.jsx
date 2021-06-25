@@ -2,39 +2,26 @@ import React, { useState } from 'react';
 import { Input, Layout, Select,Row,Col, Button, Table, Tag } from 'antd';
 import { Link } from 'react-router-dom';
 import './index.scss'
+import { transformDirectionData } from '../../../component/service/direction-service';
 
 const { Option } = Select;
 const { Column } = Table;
-const randomNum = (min, max) => Math.floor(Math.random() * (max - min)) + min;
-const initList = require('../../../../static/class.json')
+
+const STATE=[<Tag color="error">未开始</Tag>,<Tag color="success">正在执行</Tag>,<Tag color="default">已结课</Tag>];
+const JONIABLE =[<Tag color="error">否</Tag>,<Tag color="success">是</Tag>]
 
 class List extends React.Component {
   constructor(props) {
     super(props);
-    this.list=initList;
     this.state={
       "search-type":'search-name',
+      'list':props.list
     };
-    this.searchMessage={
-      'search-name':'请输入课程名称',
-      'search-id':'请输入课程编号',
-    }
   }
-
-  onChangeSearchType=(e)=>{
+  componentWillReceiveProps(props) {
     this.setState({
-      "search-type":e,
+      'list':props.list
     });
-    console.log(this.state);
-  }
-
-  renderbtnGroup = () => {
-    return(
-      <Button.Group className="btnGroup" >
-        <Button>新增</Button>
-        <Button>批量删除</Button>
-      </Button.Group>
-    );
   }
 
   renderOption  = (text,record,index) => {
@@ -58,41 +45,17 @@ class List extends React.Component {
   render(){
     return (
       <Layout>
-        <Layout  className="search-contains">
+        <Layout  >
           <Row>
-            <Col>
-              <Select defaultValue="search-name" className="search-type" onChange={this.onChangeSearchType}>
-                <Option value="search-name">课程名称</Option>
-                <Option value="search-id">课程编号</Option>
-              </Select>
-            </Col>
-            <Col>
-              <Input className="search" placeholder={this.searchMessage[this.state['search-type']]} />
-            </Col>
-            <Col>
-            <Button>查询</Button>
-            </Col>
-          </Row>
-        </Layout>
-        <Layout className="list-contains" >
-          <Row>
-            <Col style={{marginLeft:"auto"}}>
-                {this.renderbtnGroup()}
-            </Col>
-          </Row>
-          <Row>
-            <Table className="table" dataSource={this.list} >
-              <Column title="课程编号" key="id" dataIndex="id" />
-              <Column title="课程名称" key="name" dataIndex="name"/>
-              <Column title="授课教师" key="teacher" dataIndex="teacher"/>
-              <Column title="学校" key="school" dataIndex="school"/>
-              <Column title="专业" key="major" dataIndex="major"/>
-              <Column title="开课时间" key="time" dataIndex="time"/>
-              <Column title="状态" key="status" dataIndex="status" render={(status)=>{
-                if(status==0) return <Tag color="error">未开始</Tag>
-                else if(status==1) return <Tag color="success">正在执行</Tag>
-                else if(status==2) return <Tag color="default">已结课</Tag>
-              }}/>
+            <Table className="table" dataSource={this.state.list} >
+              <Column title="课程编号" key="courseId" dataIndex="courseId" />
+              <Column title="课程名称" key="courseName" dataIndex="courseName"/>
+              <Column title="授课教师" key="teacherName" dataIndex="teacherName"/>
+              <Column title="学校" key="courseschool" dataIndex="courseschool" render={(value)=>{return transformDirectionData(value,'school')}} />
+              <Column title="专业" key="coursemajor" dataIndex="coursemajor" render={(value)=>{return transformDirectionData(value,'major')}}/>
+              <Column title="开课学期" key="term" dataIndex="term"/>
+              <Column title="可加入" key="joinable" dataIndex="joinable" render={(status)=>{return JONIABLE[status]}} />
+              <Column title="状态" key="coursestate" dataIndex="coursestate" render={(status)=>{return STATE[status];}}/>
 
               <Column dataIndex="option" width={200} key="option" render={this.renderOption} />
             </Table>

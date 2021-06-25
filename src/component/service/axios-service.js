@@ -26,6 +26,9 @@ axios.interceptors.request.use(
     }
   )
   axios.defaults.headers.post['Content-Type']="application/json";
+export async function AddToken(token) {
+  axios.defaults.headers.post['Token']=token;
+}
 export async function Request(method,target,data) {
     var info;
     method = method || 'POST';
@@ -35,6 +38,10 @@ export async function Request(method,target,data) {
     if(method === 'POST') {
         info = await Post(target,data);
     }
+    // if(info.success) {b
+    //   alert(info.msg);
+    // }
+    
     console.log('request data',info);
     return info;
 }

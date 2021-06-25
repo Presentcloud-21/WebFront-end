@@ -14,6 +14,7 @@ import {
 import PropTypes from 'prop-types';
 import MySider from '../my-sider';
 import MyHeader from '../my-header';
+import { getDirection } from '../service/direction-service';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;

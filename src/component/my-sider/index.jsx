@@ -22,6 +22,7 @@ class MySider extends React.Component {
   };
 
   onSignout = () => {
+    window.sessionStorage.removeItem('user');
     window.location.href='/login'
   }
   render() {

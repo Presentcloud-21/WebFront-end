@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Avatar, Row, Col } from 'antd'
+import { Layout, Avatar, Row, Col,Button } from 'antd'
 
 const { Header } = Layout
 
@@ -14,9 +14,9 @@ class MyHeader extends React.Component {
           <Avatar style={{top:0}} size="middle" src="/assets/avata.png"  />
         </Col>
         <Col>
-          <p>
-            myname
-          </p>
+          <Button type="link"> 
+            {JSON.parse(window.sessionStorage.user).userName}
+          </Button>
         </Col>
       </Row>
     </Header>

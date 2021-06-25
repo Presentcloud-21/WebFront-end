@@ -16,7 +16,7 @@ class MyTest extends React.Component {
 
  
   onfinish = (e)=> {
-    Request('GET','ajax/getusermessage/'+e.tel).then((response)=>{
+    Request('GET','ajax/getalluser/').then((response)=>{
       console.log(response);
     })
 
