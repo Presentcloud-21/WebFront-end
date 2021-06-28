@@ -1,5 +1,4 @@
-import Layout from 'antd/lib/layout/layout';
-import React from 'react';
+import React  from 'react' ;
 import MyLayout from '../../../component/my-layout';
 import { Request } from '../../../component/service/axios-service';
 import { Button, Row, Col,Modal,Form,Input } from 'antd';
@@ -12,15 +11,15 @@ class UserList extends React.Component {
     constructor(props) {
         super(props);
         this.state={
-            'list':initList,
+            'list':[],
             'selectedRowKey':[]
         }
-        // Request('GET','/ajax/getalluser').then((response)=>{
-        //     const {data} = response.data;
-        //     this.setState({
-        //         'list':data
-        //     });
-        // })
+        Request('GET','/ajax/getalluser').then((response)=>{
+            const {data} = response.data;
+            this.setState({
+                'list':data
+            });
+        })
     }
     
     renderButton = () => {
@@ -91,7 +90,7 @@ class UserList extends React.Component {
         title:'联系方式',key:'tel',dataIndex:'tel'
     },{
         title:'年龄',key:'age',dataIndex:'birthyear',
-        render:(val)=>{return (new Date().getFullYear()-val)}
+        render:(val)=>{if(val!=null) return (new Date().getFullYear()-parseInt(val.substring(0,4)));else return '未知'}
     },{
         title:'学校',key:'school',dataIndex:'userschool',
     },{
@@ -113,7 +112,7 @@ class UserList extends React.Component {
             </Col>
         </Row>
         <Row>
-           <BaseList list={this.state.list} columns={columns} selectedCallback={this.selectedCallback} />
+           <BaseList list={this.state.list} columns={columns} isSelection={true} selectedCallback={this.selectedCallback} />
         </Row>
         </div>
     </MyLayout>

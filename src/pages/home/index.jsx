@@ -1,4 +1,4 @@
-import React from 'react';
+import React  from 'react' ;
 import MyLayout from '../../component/my-layout'
 import { getDirection } from '../../component/service/direction-service';
 import './index.scss';

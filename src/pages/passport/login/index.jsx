@@ -1,9 +1,9 @@
-import React from 'react';
+import React  from 'react' ;
 import LoginLayout from '../../../component/login-component/login-layout';
 import './index.scss'
 import { Row ,Spin,Col, Input , Radio , Checkbox , Button , Form} from 'antd'
 import { UserOutlined , LockOutlined, MobileOutlined,LoadingOutlined  } from '@ant-design/icons'
-import { AddToken, Request } from '../../../component/service/axios-service';
+import { AddToken, errorModal, Request, successMessage } from '../../../component/service/axios-service';
 
 const { Item } = Form;
 
@@ -12,10 +12,6 @@ class Login extends  React.Component {
     super(props);
     this.state=({
       'LoginType':'password',
-      'alert':false,
-      'type':'',
-      'message':'',
-      'description':'',
       'tel':'',
       'second':0
     });
@@ -53,21 +49,11 @@ class Login extends  React.Component {
       const {data}=response;
       console.log("Signup respond:",data);
       if(data.success) {
-        this.setState({
-          'alert':true,
-          'type':'success',
-          'message':'登录成功',
-          'description':data.msg
-        })
+        successMessage('登录成功');
         AddToken(data.token);
         this.onLogin(this.state.tel);
       } else  {
-        this.setState({
-          'alert':true,
-          'type':'error',
-          'message':'登录失败',
-          'description':data.msg
-        })
+        errorModal('登录失败',data.msg);
       }
     });
   }
@@ -93,23 +79,17 @@ class Login extends  React.Component {
     })
   }
   sendSms = (e) => {
-    this.onCount(10);
-    Request('GET','/ajax/loginsendSms/'+this.state.tel).then((response)=>{
+    if(this.state.tel==='') {
+      errorModal('验证码发送失败','请先输入手机号码');
+      return;
+    } 
+    Request('POST','/ajax/loginsendSms/'+this.state.tel).then((response)=>{
       const {data}=response;
       if(data.success){
-        this.setState({
-          'alert':true,
-          'type':'success',
-          'message':'验证码发送成功',
-          'description':''
-        })
+        this.onCount(60);
+        successMessage('验证码发送成功');
       } else {
-        this.setState({
-          'alert':true,
-          'type':'error',
-          'message':'验证码发送失败',
-          'description':data.message
-        })
+        errorModal('验证码发送失败',data.msg);
       }
       console.log(data);
     })
@@ -143,7 +123,7 @@ class Login extends  React.Component {
 
   render() {
     return (
-    <LoginLayout alert={this.state.alert} type={this.state.type} message={this.state.message} description={this.state.description}>
+    <LoginLayout>
       <Row>
         <Radio.Group className="radio" name="login-type" onChange={this.onLoginType}  defaultValue="password">
           <Radio className="radio-item"value="password">密码登录</Radio>
@@ -186,8 +166,6 @@ class Login extends  React.Component {
                         <Button className="captcha-button" onClick={this.sendSms}   size="large">发送验证码</Button>
                         :
                         <Button disabled   size="large"><Spin indicator={<LoadingOutlined /> }>{this.state.second}</Spin></Button>
-
-
                       }
                     </Item>
                   </Col>

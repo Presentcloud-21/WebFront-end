@@ -1,5 +1,4 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React  from 'react' ;
 import './index.scss';
 import { Layout, Menu, Breadcrumb } from 'antd';
 import {
@@ -30,8 +29,11 @@ class MyLayout extends React.Component {
   
   constructor(props) {
     super(props);
+    getDirection();
     console.log('mylayout',props);
   }
+
+ 
 
   render() {
     return (
@@ -39,7 +41,7 @@ class MyLayout extends React.Component {
         <MySider/>
         <Layout className="site-layout" >
           <MyHeader/>
-          <Content className="content-contains" >
+          <Content   className="content-contains" >
           {this.props.children}<br /><br /><br />
           </Content>
           <Footer style={{ textAlign: 'center' }}>工程训练 @2021 21组</Footer>

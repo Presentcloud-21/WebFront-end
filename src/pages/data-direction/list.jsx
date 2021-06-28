@@ -14,45 +14,45 @@ const ISDEFAULT = {"0":"否","1":"是"};
 class List extends React.Component {
   constructor(props) {
     super(props);
-    console.log('list',props);
     this.state={
       "code":props.code,
       "id":props.id,
       'pId':props.pId,
       'hasChange':false,
-      'list':[]
+      'list':[],
+      'transform':[]
     };
-    this.onInit();
+    this.onInit(props);
   }
 
-  onInit = ()=>{
+  onInit = (props)=>{
     let max=0;
-    if(this.state.pId!=0) {
-      Request('GET','/ajax/dictionary/dictionarydetailbyid/'+this.state.pId).then((response)=>{
-      const {data}=response;
-      console.log('pId',data);
-      let json=[];
+    if(props.pId!=0) {
+      Request('GET','/ajax/dictionary/dictionarydetailbyid/'+props.pId).then((response)=>{
+      const {data}=response.data;
+      let json=new Map();
       data.map((i)=>{
-        json["_"+String(i.dictionaryDetailId)] = i.itemValue;
+        json.set(i.dictionaryDetailId,i.itemValue);
       });
-      console.log('json',json);
       this.setState({
         'plist':data,
         'transfrom':json
       });
     });
     }
-    Request('GET','/ajax/dictionary/dictionarydetailbycode/'+this.state.code).then((response)=>{
-      const {data}=response;
-      this.setState({
-        'list':data
-      });
-      this.state.list.map((i)=>{
+    Request('GET','/ajax/dictionary/dictionarydetailbycode/'+props.code).then((response)=>{
+      const {data}=response.data;
+      data.map((i)=>{
         if(i.itemKey > max) {
           max = i.itemKey;
         }
       })
       this.setState({
+        'code':props.code,
+        'id':props.id,
+        'pId':props.pId,
+        'hasChange':false,
+        'list':data,
         'keynum':max
       });
     });
@@ -60,14 +60,7 @@ class List extends React.Component {
 
   componentWillReceiveProps(props) {
     console.log('mount',props);
-    this.setState({
-      "code":props.code,
-      "id":props.id,
-      'pId':props.pId,
-      'hasChange':false,
-      'list':[]
-    });
-    this.onInit();
+    this.onInit(props);
   }
 
   onGetOption = (list) => {
@@ -230,9 +223,6 @@ class List extends React.Component {
       )
     });
   }
-  componentDidMount() {
-    getDirection();
-  }
   onEdit = (e,index,callback)=> {
     console.log('edit',e);
     console.log('index',index);
@@ -296,7 +286,6 @@ class List extends React.Component {
       'hasChange':false,
     })
     Request('POST','/ajax/dictionary/updatedictionary',JSON.stringify(this.state.list)).then((response)=>{
-      console.log('add new type',response);
       window.location.reload();
     })
   }
@@ -320,7 +309,7 @@ class List extends React.Component {
             {
               this.state.pId == 0?null:
               <Column title="所属" key="detailpId" dataIndex="detailpId"
-              render={(value)=>{return this.state.transfrom["_"+String(value)]}} 
+              render={(value)=>{return this.state.transfrom.get(value)}} 
               />
             }
             <Column dataIndex="option" width={200} key="option" render={this.renderOption} />

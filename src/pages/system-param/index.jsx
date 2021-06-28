@@ -1,4 +1,4 @@
-import React, { Children } from 'react';
+import React  from 'react' ;
 import MyLayout from '../../component/my-layout';
 import List from './list';
 import { Row, Col, Menu, Button, Modal, Form, Input} from 'antd'

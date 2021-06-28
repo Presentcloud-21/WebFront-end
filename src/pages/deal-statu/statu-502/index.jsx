@@ -1,4 +1,4 @@
-import React from 'react';
+import React  from 'react' ;
 import { Button, Result } from 'antd';
 function Statu502() {
   return (

@@ -1,4 +1,4 @@
-import React, { Children } from 'react';
+import React  from 'react' ;
 import MyLayout from '../../component/my-layout';
 import List from './list';
 import { Cascader,Row, Col, Menu, Button, Modal, Form, Input} from 'antd'
@@ -31,6 +31,9 @@ class DataDirection extends React.Component {
   componentDidUpdate() {
     console.log('selected key',this.state.selected_key);
 
+  }
+  componentDidMount() {
+    getDirection();
   }
 
   onSelectType = (e,list)=>{

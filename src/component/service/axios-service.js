@@ -1,21 +1,22 @@
 import axios from 'axios';
+import {message,Modal} from 'antd';
 axios.interceptors.request.use(
     (config) => {
       console.log('request success:',config);
       return config;
     },(error)=> {
-      console.log('request error:',error);
+      // console.log('request error:',error);
       return Promise.reject(error);
     }
   )
   
   axios.interceptors.response.use(
     (response)=>{
-      console.log('response suceess:',response);
+      // console.log('response suceess:',response);
       return response;
     },(error)=>{
       const code=error.response.status;
-      console.log('response error:',code);
+      // console.log('response error:',code);
       switch(code) {
         case 401:window.location.href-'/login';break;
         // case 404:window.location.href='/status404';break;
@@ -28,6 +29,11 @@ axios.interceptors.request.use(
   axios.defaults.headers.post['Content-Type']="application/json";
 export async function AddToken(token) {
   axios.defaults.headers.post['Token']=token;
+}
+export function getLocalData(code) {
+  const res=window.sessionStorage.getItem(code);
+  if(res==undefined || res==null) return res;
+  return JSON.parse(res);
 }
 export async function Request(method,target,data) {
     var info;
@@ -42,7 +48,7 @@ export async function Request(method,target,data) {
     //   alert(info.msg);
     // }
     
-    console.log('request data',info);
+    // console.log('request data',info);
     return info;
 }
 
@@ -54,4 +60,13 @@ async function Get(target) {
 async function Post(target,data) {
     const info = await axios.post(target,data);
     return info;
+}
+export function errorModal(title,content) {
+  Modal.error({
+    title: title,
+    content: content,
+  });
+}
+export function successMessage(content)  {
+  message.success(content);
 }

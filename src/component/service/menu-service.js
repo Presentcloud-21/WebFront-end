@@ -36,6 +36,10 @@ import {
     "url":"/system-param",
     "name":"系统参数",
     "icon":<SettingOutlined />
+},{
+    "url":"/role-edit",
+    "name":"角色管理",
+    "icon":<SettingOutlined />
 }];
 
   export function getMenu() {

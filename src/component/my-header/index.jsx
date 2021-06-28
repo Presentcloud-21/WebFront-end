@@ -1,4 +1,4 @@
-import React from 'react';
+import React  from 'react' ;
 import { Layout, Avatar, Row, Col,Button } from 'antd'
 
 const { Header } = Layout

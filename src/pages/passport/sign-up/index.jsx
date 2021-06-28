@@ -1,9 +1,9 @@
-import React from 'react';
+import React  from 'react' ;
 import LoginLayout from '../../../component/login-component/login-layout';
 import './index.scss'
-import { Row , Input , Button , Form, Alert, Col} from 'antd'
-import { UserOutlined , LockOutlined , MailOutlined , MobileOutlined , LockFilled } from '@ant-design/icons'
-import { Request } from '../../../component/service/axios-service';
+import { Row , Input , Button , Form, Col,Spin} from 'antd'
+import { UserOutlined , LockOutlined , MailOutlined , MobileOutlined ,LoadingOutlined, LockFilled } from '@ant-design/icons'
+import { errorModal, Request, successMessage } from '../../../component/service/axios-service';
 
 const { Item } = Form;
 
@@ -12,11 +12,8 @@ class SignUp extends  React.Component {
     super(props);
     this.state=({
       'LoginType':'password',
-      'alert':false,
-      'type':'',
-      'message':'',
-      'description':'',
-      'tel':''
+      'tel':'',
+      'second':0
     });
   }
   onFinish = (values) =>  {
@@ -26,20 +23,10 @@ class SignUp extends  React.Component {
       const {data}=response;
       console.log("Signup respond:",data);
       if(data.success) {
-        this.setState({
-          'alert':true,
-          'type':'success',
-          'message':'登录成功',
-          'description':data.message
-        })
+        successMessage('注册成功');
         window.location.href='/login';
       } else  {
-        this.setState({
-          'alert':true,
-          'type':'error',
-          'message':'登录失败',
-          'description':data.message
-        })
+       errorModal('注册失败',data.msg);
       }
     });
   }
@@ -53,16 +40,40 @@ class SignUp extends  React.Component {
     });
   }
 
+  onCount = (time) => {
+    let end_time = new Date().getTime() + time*1000;
+    var sys_second = (end_time - new Date().getTime());
+    this.timer = setInterval(()=> {
+      if(sys_second>=1000) {
+        sys_second -= 1000;
+        this.setState({
+          'second':Math.floor(sys_second/1000 % 60)
+        })
+      } else {
+        clearInterval(this.timer);
+      }
+    },1000);
+  }
+
   sendSms = () => {
-    console.log(typeof(this.state.tel));
+    if(this.state.tel==='') {
+      errorModal('验证码发送失败','请先输入手机号码');
+      return;
+    } 
     Request('POST','/ajax/signupsendSms/'+this.state.tel,JSON.stringify({})).then((response)=>{
       const {data}=response;
+      if(data.success) {
+        this.onCount(60);
+        successMessage('验证码发送成功');
+      } else {
+        errorModal('验证码发送失败',data.msg);
+      }
       console.log(data);
     })
   }
   render() {
     return (
-      <LoginLayout alert={this.state.alert} type={this.state.type} message={this.state.message} description={this.state.description}>
+      <LoginLayout>
       <Row>
         <Form 
           name="login" 
@@ -87,9 +98,12 @@ class SignUp extends  React.Component {
                     </Item> 
                   </Col>
                   <Col span={6}>
-                    <Item>
-                      <Button className="captcha-button" onClick={this.sendSms}   size="large">发送验证码</Button>
-                    </Item>
+                  {
+                        this.state.second == 0?
+                        <Button className="captcha-button" onClick={this.sendSms}   size="large">发送验证码</Button>
+                        :
+                        <Button disabled   size="large"><Spin indicator={<LoadingOutlined /> }>{this.state.second}</Spin></Button>
+                  }
                   </Col>
                 </Row>
               </Item>

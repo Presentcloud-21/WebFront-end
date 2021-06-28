@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Input, Layout, Select,Row,Col, Button, Table } from 'antd';
 import { Link } from 'react-router-dom';
 import './index.scss'
@@ -14,15 +14,21 @@ class BaseList extends React.Component {
             i['render'] = (val)=>{return transformDirectionData(val,i.key)}
         }
     });
-    console.log(columns);
+    for(let i=0;i<props.list.length;++i) {
+      props.list[i]["key"]=i;
+    }
     this.state={
       'list':props.list,
       'columns':columns,
+      'isSelection':props.isSelection || false,
       'selectedRowKey':[],
       'selectedCallback':props.selectedCallback
     };
   }
   componentWillReceiveProps(props) {
+    for(let i=0;i<props.list.length;++i) {
+      props.list[i]["key"]=i;
+    }
     this.setState({
       'list':props.list
     });
@@ -32,14 +38,14 @@ class BaseList extends React.Component {
     this.setState({
       'selectedRowKey':selectedRowKey
     });
-    selectedCallback(selectedRowKey);
+    // this.state.selectedCallback(selectedRowKey);
   }
   render(){
-    const {selectedRowKey} = this.state;
-    const rowSelection = {
+    const {selectedRowKey,isSelection} = this.state;
+    const rowSelection = isSelection?  {
       selectedRowKey,
       onChange: this.onSelectChange,
-    };
+    }:null;
     return (
       <Layout className="list-contains" >
         <Table columns={this.state.columns} rowSelection={rowSelection} className="list-table" dataSource={this.state.list}
