@@ -17,6 +17,7 @@ import SystemParam from './src/pages/system-param';
 import PrivaryRoute from './src/component/privary-route';
 import UserList from './src/pages/list/user-list';
 import RoleEdit from './src/pages/role-edit';
+import EditClass from './src/pages/list/edit-class';
 
 ReactDOM.render(
     <BrowserRouter>
@@ -28,6 +29,7 @@ ReactDOM.render(
             <PrivaryRoute path='/direction' component={DataDirection} />
             <PrivaryRoute path='/system-param' component={SystemParam} />
             <PrivaryRoute path='/role-edit' component={RoleEdit} />
+            <PrivaryRoute path='/edit-class' component={EditClass}/>
             <Route path='/login' component={Login} />
             <Route path='/sign-up' component={SignUp} />
             <Route path='/test' component={MyTest} />

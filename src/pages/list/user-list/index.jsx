@@ -25,7 +25,6 @@ class UserList extends React.Component {
     renderButton = () => {
         return(
             <Button.Group>
-                <Button onClick={this.onAddDirectionType} type="primary">新增用户</Button>
                 <Button type="danger" style={{margin:'0px 24px'}}>批量删除</Button>
             </Button.Group>
         )
@@ -49,37 +48,7 @@ class UserList extends React.Component {
           </Row>
           );
       }
-    onAddDirectionType = ()=>{
-        const modal = Modal.confirm();
-        const destroy =  ()=> {
-          modal.destroy();
-        }
-        modal.update({
-          title:'新增用户',
-          okText:'新增',
-          cancelText:'取消',
-          destroyOnClose:true,
-          okButtonProps:{style:{'display':'none'}},
-          cancelButtonProps:{style:{'display':'none'}},
-          footer:null,
-          content: (
-            <Form
-              onFinish={(e)=>this.onAddUser(e,destroy)}
-            >
-              姓名
-              <Form.Item name="userName" rules={[{ required: true, message: '用户名称不能为空' }]}  >
-                <Row><Input/></Row>
-              </Form.Item>
-              联系方式
-              <Form.Item name="tel"  rules={[{ required: true, message: '用户关键字不能为空' }]} >
-                <Row><Input/></Row>
-              </Form.Item>
-              <Button type="primary" htmlType="submit">提交</Button>
-              <Button type="danger" className="modal_cancel" onClick={()=>{modal.destroy()}}>取消</Button>
-            </Form>
-          )
-        });
-      }
+
     
   render() {
     const columns = [{

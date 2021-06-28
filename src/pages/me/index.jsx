@@ -2,22 +2,24 @@ import React  from 'react' ;
 import MyLayout from '../../component/my-layout'
 import './index.scss';
 import { Space, Row, Col, Input, Layout, Avatar,Button, Upload,Form,DatePicker,Select  } from 'antd';
-import { getLocalData, Request } from '../../component/service/axios-service';
+import { errorModal, getLocalData, Request } from '../../component/service/axios-service';
 import { getDictationbyCode } from '../../component/service/direction-service';
 const {Item} = Form;
 class Me extends React.Component {
   constructor(props) {
     super(props);
-    const user=window.sessionStorage.user;
+    const user=getLocalData('user');
     this.state={
-        'user':JSON.parse(user),
-        'majorlist':[]
+        'user':user,
+        'majorlist':[],
+        'avatar':user.avatar
     };
     
     this.getMajor(this.state.user.userschool);
 
   }
   onSave = (e) =>{
+    e['avatar']=this.state.avatar;
     console.log('update',e);
     Request('POST','/ajax/updateusermessage',JSON.stringify(e)).then((response)=>{
       Request('GET','/ajax/getusermessage/'+this.state.user.tel).then((response)=>{
@@ -45,18 +47,45 @@ class Me extends React.Component {
     })
   }
   
-   customRequest=(option)=> {
-    const formData = new FormData();
-    formData.append("files[]", option.file);
+  getBase64(img, callback) {
     const reader = new FileReader();
-    reader.readAsDataURL(option.file);
-    reader.onloadend = function(e) {
-      console.log(e.target.result);// 打印图片的base64
-      if (e && e.target && e.target.result) {
-        option.onSuccess();
-      }
-    };
+    reader.addEventListener('load', () => callback(reader.result));
+    reader.readAsDataURL(img);
   }
+  handleChange = info => {
+    if (info.file.status === 'done') {
+      // Get this url from response in real world.
+      this.getBase64(info.file.originFileObj, imageUrl =>
+        this.setState({
+          'avatar':imageUrl
+        }),
+      );
+    }
+  };
+
+ customRequest=(option)=> {
+  const formData = new FormData();
+  formData.append("files[]", option.file);
+  const reader = new FileReader();
+  reader.readAsDataURL(option.file);
+  let res;
+  reader.onloadend = function(e) {
+    res=e.target.result;
+    // console.log(e.target.result);// 打印图片的base64
+    if (e && e.target && e.target.result) {
+      option.onSuccess();
+    }
+  };
+  this.setState('avatar',res);
+  console.log('avatar',this.state.avatar);
+}
+ beforeUpload(file) {
+  const isLt2M = file.size / 1024 / 1024 < 2;
+  if (!isLt2M) {
+    errorModal('不能超过2MB');
+  }
+  return isLt2M;
+}
 
   render() {
     return (
@@ -123,17 +152,24 @@ class Me extends React.Component {
               </Space>
             </Col>
             <Col className="me-avatar-contains">
-              <Item name="avatar"  initialValue={this.state.user.avatar}>
-                <Upload customRequest={this.customRequest}>
-                  <Space  direction="vertical" className="me-info" size="small" align="center">
-                    <Row>
-                      <Avatar style={{top:0}} size={108} src="/assets/avata.png"  />
-                    </Row>
-                    <Row>
-                      <Button>更换头像</Button>
-                    </Row>
-                  </Space>
-                </Upload>
+              <Item name="avatar"  initialValue={this.state.avatar}>
+              <Upload     
+                name="avatar"    
+                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                onChange={this.handleChange}        
+                beforeUpload={this.beforeUpload}
+                >
+          <Space  direction="vertical" className="me-info" size="small" align="center">
+            <Row>
+              <Avatar style={{top:0}} size={108} src={this.state.avatar}  />
+
+              {/* <img src={this.state.avatar} alt="avatar"/> */}
+            </Row>
+            <Row>
+              <Button>更换头像</Button>
+            </Row>
+          </Space>
+        </Upload>
               </Item>
               
             </Col>

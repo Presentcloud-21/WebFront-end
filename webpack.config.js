@@ -112,6 +112,32 @@ module.exports = (env, argv) => {
   }
 
   if (argv.mode === 'production') {
+    config.devtool = 'source-map';
+
+    // 开发环境本地 web 服务
+    config.devServer = {
+      inline:true,  //缺少该配置，会出现上面的错误
+      historyApiFallback:true,  //缺少该配置，会出现上面的错误
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true',
+      },
+      proxy: {
+        '/ajax': {
+          // target: 'http://127.1.0.0:8000',
+          target: 'http://192.168.1.170:8080',
+          pathRewrite: {'^/ajax' : ''},
+          changeOrigin:true,
+          secure:false,
+        }
+      },
+      stats: {
+        chunks: false,
+        children: false,
+        modules: false,
+        chunkModules: false,
+      },
+    };
     // ...
   }
 
