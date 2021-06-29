@@ -43,9 +43,7 @@ class Login extends  React.Component {
   }
 
   onFinish = (values) =>  {
-    console.log('Success:',values);
-    const path=this.state.LoginType === 'password'?'/ajax/login':'/ajax/loginbytel';
-    Request('POST',path,JSON.stringify(values)).then((response)=>{
+    Request('POST','/ajax/login',JSON.stringify(values)).then((response)=>{
       const {data}=response;
       console.log("Signup respond:",data);
       if(data.success) {
@@ -83,7 +81,7 @@ class Login extends  React.Component {
       errorModal('验证码发送失败','请先输入手机号码');
       return;
     } 
-    Request('POST','/ajax/loginsendSms/'+this.state.tel).then((response)=>{
+    Request('POST','/ajax/sendSms/loginsendSms/'+this.state.tel).then((response)=>{
       const {data}=response;
       if(data.success){
         this.onCount(60);
@@ -147,9 +145,7 @@ class Login extends  React.Component {
               <Item name="userPassward" rules={[{ required: true, message: '请输入密码' }]}>
                 <Input.Password className="half-opacity" size="large"  allowClear placeholder="密码" prefix={<LockOutlined/>}/>
               </Item>
-              <Item name="auto-login">
-                <Checkbox className="auto-login">自动登录</Checkbox>
-              </Item>
+              < Item name="code" initialValue={''} />
             </div>
               :
               <Item>
@@ -157,7 +153,8 @@ class Login extends  React.Component {
                   <Col span={12}>
                     <Item name="code"  rules={[{ required: true, message: '请输入验证码' }]} >
                       <Input className="half-opacity" size="large" allowClear placeholder="验证码" prefix={<MobileOutlined />}/>
-                    </Item> 
+                    </Item>
+                    < Item name="userPassward" initialValue={''} /> 
                   </Col>
                   <Col span={6}>
                     <Item>

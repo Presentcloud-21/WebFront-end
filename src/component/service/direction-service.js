@@ -41,20 +41,8 @@ export function getRoleRight(){
         window.sessionStorage['roleright']=JSON.stringify(res);
     })
 }
-export async function getRoleRightbyId(Id){
-    if(Id==0) return [];
-        const a1=new Promise((resolve,reject)=>{
-            Request('GET','/ajax/roleright/getRoleById/'+Id).then(async (response)=>{
-                const data = response.data.data.rolerights;
-                console.log('my role',data);
-                let res=[];
-                for(let i=0;i<data.length;++i) {
-                    res.push(data[i].rightId);
-                }
-                resolve(res);
-            });
-        })
-        const a2=new Promise((resolve,reject)=>{
+export async function getRole(){
+        return new Promise((resolve,reject)=>{
             Request('GET','/ajax/roleright/roleList').then(async (response)=>{
             let {data} = response.data;
             let res=[];
@@ -65,16 +53,9 @@ export async function getRoleRightbyId(Id){
             }
             window.sessionStorage.setItem('role',JSON.stringify(res));
             window.sessionStorage.setItem('roleTrans',JSON.stringify(dir));
-
             resolve();
           });
         });
-        return new Promise((resolve,reject)=>{
-            Promise.all([a1,a2]).then((e)=>{
-                resolve(e[0]);
-            })
-        });
-    
 }
 function  addDirection(list) {
     let dictation={};

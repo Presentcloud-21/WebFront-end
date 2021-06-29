@@ -1,12 +1,9 @@
 import React  from 'react' ;
 import MyLayout from '../../../component/my-layout';
-import { errorModal, getLocalData, Request } from '../../../component/service/axios-service';
-import {Popconfirm, Button, Row, Col,Modal,Form,Input } from 'antd';
-import {PlusOutlined,MinusOutlined,CloseOutlined} from '@ant-design/icons';
+import { getLocalData, Request } from '../../../component/service/axios-service';
+import {Popconfirm, Button, Row, Col } from 'antd';
 import BaseList from '../../../component/base-list';
 import { Link } from 'react-router-dom';
-const initList = require("../../../../static/teacher.json");
-const ROLE=['管理员','教师','学生'];
 
 class UserList extends React.Component {
     constructor(props) {

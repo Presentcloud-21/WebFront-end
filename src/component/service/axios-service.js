@@ -2,7 +2,11 @@ import axios from 'axios';
 import {message,Modal} from 'antd';
 axios.interceptors.request.use(
     (config) => {
+
       console.log('request success:',config);
+      let token = window.localStorage.getItem('token');
+      config.headers.Authorization = token;
+      
       return config;
     },(error)=> {
       // console.log('request error:',error);
@@ -28,7 +32,8 @@ axios.interceptors.request.use(
   )
   axios.defaults.headers.post['Content-Type']="application/json";
 export async function AddToken(token) {
-  axios.defaults.headers.post['Token']=token;
+  console.log('token',token);
+  window.localStorage.setItem('token',token);
 }
 export function getLocalData(code) {
   const res=window.sessionStorage.getItem(code);

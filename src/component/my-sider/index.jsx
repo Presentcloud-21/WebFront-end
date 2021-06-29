@@ -11,13 +11,9 @@ class MySider extends React.Component {
     super(props);
     this.state = {
       collapsed: false,
-      menus:[]
+      menus:getMenu()
     };
-    getMenu().then((res)=>{
-      this.setState({
-        "menus":res
-      })
-    })
+    
     console.log('menus',this.state.menus);
   }
   
