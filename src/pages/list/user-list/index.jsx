@@ -1,7 +1,7 @@
 import React  from 'react' ;
 import MyLayout from '../../../component/my-layout';
 import { errorModal, getLocalData, Request } from '../../../component/service/axios-service';
-import { Button, Row, Col,Modal,Form,Input } from 'antd';
+import {Popconfirm, Button, Row, Col,Modal,Form,Input } from 'antd';
 import {PlusOutlined,MinusOutlined,CloseOutlined} from '@ant-design/icons';
 import BaseList from '../../../component/base-list';
 import { Link } from 'react-router-dom';
@@ -35,6 +35,12 @@ class UserList extends React.Component {
         'selectedRowKey':data
       })
     }
+    deleteUser =(tel)=>{
+        Request('POST','/ajax/logoutuserById/'+tel).then((response)=>{
+            console.log('delete User',response);
+            window.location.reload();
+        })
+    }
     renderOption  = (tel) => {
       const url="user/edit-user";
         return(
@@ -47,7 +53,14 @@ class UserList extends React.Component {
                 </Button>
             </Col>
             <Col>
-              <Button type="link" onClick={()=>{console.log(e);}}>删除</Button>
+            <Popconfirm  
+          title="是否确认删除该数据？"
+          okText="删除"
+          cancelText="取消"
+          onConfirm={()=>{
+          this.deleteUser(tel);
+        }}><Button type="link">删除</Button></Popconfirm>
+              
             </Col>
           </Row>
           );
@@ -70,7 +83,7 @@ class UserList extends React.Component {
         title:'专业',key:'major',dataIndex:'depart',
     },{
         title:'角色',key:'roleTrans',dataIndex:'role',
-        render:(val)=>{ console.log('rolechange',val); return getLocalData('roleTrans')["_"+String(val)]}
+        render:(val)=>{ console.log('rolechange',val);if(val==0) return "未认证"; return getLocalData('roleTrans')["_"+String(val)]}
     },{
         title:'操作',key:'options',dataIndex:'tel',
         render:(val)=>{return this.renderOption(val)}

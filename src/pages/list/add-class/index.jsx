@@ -1,11 +1,11 @@
 import React  from 'react' ;
 import './index.scss';
-import { Switch,Space, Row, Col, Input, Layout, Avatar,Button, Upload,Form,DatePicker,Select  } from 'antd';
+import { Switch,Space,Breadcrumb, Row, Col, Input, Layout, Avatar,Button, Upload,Form,DatePicker,Select  } from 'antd';
 import {  Request } from '../../../component/service/axios-service';
 import { getDictationbyCode } from '../../../component/service/direction-service';
 import MyLayout from '../../../component/my-layout';
 const {Item} = Form;
-class EditClass extends React.Component {
+class AddClass extends React.Component {
   constructor(props) {
     super(props);
     const user=window.sessionStorage.user;
@@ -33,8 +33,8 @@ class EditClass extends React.Component {
     })
   }
     onAdd=(e)=>{
-      e.joinable=e.joinable?1:0;
-      e.isschoolclass=e.isschoolclass?1:0;
+      e.joinable=e.joinable?2:1;
+      e.isschoolclass=e.isschoolclass?2:1;
       e['image']=this.state.avatar;
       console.log('res',e);
       Request('POST','/ajax/creatclass',JSON.stringify(e)).then((response)=>{
@@ -86,9 +86,16 @@ class EditClass extends React.Component {
     return (
     <MyLayout>
       <Layout className="me-contains" >
+        
       <Form
           onFinish={this.onAdd}
         >
+          <Breadcrumb>
+              <Breadcrumb.Item>
+                <a href="/class">我的班课</a>
+              </Breadcrumb.Item>
+              <Breadcrumb.Item>新增班课</Breadcrumb.Item>
+            </Breadcrumb>
           <Row>
           <Col span={3}/>
         <Col span={12}>
@@ -192,4 +199,4 @@ class EditClass extends React.Component {
   }
 }
 
-export default EditClass;
+export default AddClass;

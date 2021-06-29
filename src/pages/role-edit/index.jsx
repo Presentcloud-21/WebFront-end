@@ -1,7 +1,7 @@
 import React  from 'react' ;
 import BaseList from '../../component/base-list';
 import MyLayout from '../../component/my-layout';
-import {Layout,Row,Button,Form,Checkbox,Modal,Input} from 'antd';
+import {Popconfirm,Layout,Row,Col,Button,Form,Checkbox,Modal,Input} from 'antd';
 import { getLocalData, Request } from '../../component/service/axios-service';
 
 
@@ -124,8 +124,28 @@ class RoleEdit extends React.Component {
     }
     return <Checkbox.Group onChange={(e)=>{this.onChangeRight(index,value,e,set)}} options={this.state.options} defaultValue={value} disabled={disabled} /> 
   }
- 
- 
+  deleteRole =(id)=> {
+    Request('POST','/ajax/roleright/deleteRoleById/'+id).then((response)=>{
+      console.log('delete role',response);
+      window.location.reload();
+    })
+  }
+  renderOption  = (id) => {
+      return(
+        <Row>
+          <Col>
+          <Popconfirm  
+          title="是否确认删除该数据？"
+          okText="删除"
+          cancelText="取消"
+          onConfirm={()=>{
+          this.deleteRole(id);
+        }}><Button type="link">删除</Button></Popconfirm>
+            
+          </Col>
+        </Row>
+        );
+    }
   
   render() {
     const columns = [{
@@ -133,6 +153,9 @@ class RoleEdit extends React.Component {
   },{
       title:'权限分配',key:'right',dataIndex:'key',
       render:(index)=>{ return this.renderCheckbox(index)}
+  },{
+      title:'',key:'options',dataIndex:'roleId',
+      render:(index)=>{ return this.renderOption(index)}
   }];
 
     return (

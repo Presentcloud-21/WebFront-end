@@ -128,6 +128,7 @@ class SignUp extends  React.Component {
                 ]}>
             <Input.Password className="half-opacity" size="large"  allowClear placeholder="确认密码" prefix={<LockFilled/>}/>
           </Item>
+          <Item name="role" initialValue={6}/>
           <Item>
             <Button className="sign-up" htmlType="submit" size="middle">现在注册</Button>
             <Button className="to-login" href="/login"  size="middle">已有账号？现在登录</Button>

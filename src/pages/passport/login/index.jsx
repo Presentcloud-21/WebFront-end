@@ -171,9 +171,6 @@ class Login extends  React.Component {
                   </Col>
                 </Row>
               </Item>
-                
-              
-              
           }
           <Row>
             {
@@ -182,18 +179,17 @@ class Login extends  React.Component {
               <Button className="forget-password" size="middle">忘记密码</Button>
             </Item>:null
             }
-            <Item name="login" style={{marginLeft:"auto"}}>
+            
               <Button className="login" htmlType="submit" size="middle">登录账号</Button>
-            </Item>
           </Row>
         </Form>
       </Row>
-      <Button className="to-sign-up" href="#/sign-up" size="middle">没有账号？现在注册</Button>
-      <Button className="to-sign-up" onClick={this.onLoginAdmin} size="middle">游客模式(测试用)</Button>
-      <Button className="to-sign-up" 
+      <Button className="to-sign-up" href="/sign-up" size="middle">没有账号？现在注册</Button>
+      {/* <Button className="to-sign-up" onClick={this.onLoginAdmin} size="middle">游客模式(测试用)</Button> */}
+      {/* <Button className="to-sign-up" 
       onClick={this.onGitHub}
       href="https://github.com/login/oauth/authorize?client_id=b585d1b6311c67f53731&redirect_uri=http://localhost:3001/login&scope=user&state=1"
-       size="middle">GitHub登录</Button>
+       size="middle">GitHub登录</Button> */}
     </LoginLayout>
   );
   }

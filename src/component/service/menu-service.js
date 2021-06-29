@@ -31,7 +31,7 @@ import { getRoleRightbyId } from './direction-service';
     "icon":<AuditOutlined />
 },{
     "url":"/class",
-    "name":"班课列表",
+    "name":"我的班课",
     'right':null,
     "icon":<UnorderedListOutlined />
 },{

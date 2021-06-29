@@ -4,9 +4,10 @@ import { Upload,Space,Avatar,Menu,Switch, Layout,Input,Select,Tag,Row,Col,Button
 import { getLocalData, Request } from '../../../component/service/axios-service';
 import BaseList from '../../../component/base-list';
 import { getDictationbyCode } from '../../../component/service/direction-service';
+import { Link } from 'react-router-dom';
 
 const STATE=[<Tag color="error">未开始</Tag>,<Tag color="success">正在执行</Tag>,<Tag color="default">已结课</Tag>];
-const JONIABLE =[<Tag color="error">否</Tag>,<Tag color="success">是</Tag>]
+const JONIABLE =["",<Tag color="error">否</Tag>,<Tag color="success">是</Tag>]
 const MODEURL = {'join':'joinlist/','create':'createlist/','all':'getallcourse'};
 
 class ClassList extends React.Component {
@@ -15,7 +16,8 @@ class ClassList extends React.Component {
     this.state={
       'list':[],
       'majorlist':[],
-      'user':getLocalData('user')
+      'user':getLocalData('user'),
+      'avatar':''
     }
     Request('GET','/ajax/joinlist/'+getLocalData('user').userId).then((response)=> {
       const {data} = response.data;
@@ -80,7 +82,7 @@ class ClassList extends React.Component {
   renderButton = () => {
     return(
         <Button.Group>
-            <Button onClick={()=>{window.location.href="edit-class"}} type="primary">新建班课</Button>
+            <Button type="primary"><Link to="/class/add-class">新建班课</Link></Button>
             <Button type="danger" style={{margin:'0px 24px'}}>批量删除班课</Button>
         </Button.Group>
     )
@@ -96,11 +98,6 @@ class ClassList extends React.Component {
     
     return(
       <Row>
-        <Col>
-          <Button type="link">
-              修改
-            </Button>
-        </Col>
         <Col>
         <Popconfirm  
           title="是否确认删除该数据？"
@@ -127,10 +124,12 @@ class ClassList extends React.Component {
   render() {
     const {current}=this.state;
     const columns = [{
-      title:'课程编号',key:'courseId',dataIndex:'courseId'
+      title:'课程编号',key:'courseId',dataIndex:'courseId',
+      render:(id)=>{return <Button type="link" onClick={()=>{
+        window.sessionStorage.setItem('desClass',id);
+      }}> <Link to="/class/class-describe">{id}</Link></Button>}
   },{
-      title:'课程名称',key:'courseName',dataIndex:'courseName',
-      render:(name)=>{return <Button type="link">{name}</Button>}
+      title:'课程名称',key:'courseName',dataIndex:'courseName'
   },{
       title:'创建者',key:'teacherName',dataIndex:'teacherName'
   },{

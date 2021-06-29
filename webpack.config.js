@@ -125,7 +125,7 @@ module.exports = (env, argv) => {
       proxy: {
         '/ajax': {
           // target: 'http://127.1.0.0:8000',
-          target: 'http://192.168.1.170:8080',
+          target: 'http://192.168.1.170:8082',
           pathRewrite: {'^/ajax' : ''},
           changeOrigin:true,
           secure:false,

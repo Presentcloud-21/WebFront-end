@@ -1,6 +1,6 @@
 import React  from 'react' ;
 import './index.scss';
-import { Switch,Space, Row, Col, Input, Layout, Avatar,Button, Upload,Form,DatePicker,Select  } from 'antd';
+import { Breadcrumb ,Switch,Space, Row, Col, Input, Layout, Avatar,Button, Upload,Form,DatePicker,Select  } from 'antd';
 import {  getLocalData, Request } from '../../../component/service/axios-service';
 import { getDictationbyCode } from '../../../component/service/direction-service';
 import MyLayout from '../../../component/my-layout';
@@ -14,9 +14,6 @@ class EditUser extends React.Component {
         'majorlist':[],
         'success':false
     };
-    
-  }
-  componentWillMount(){
     const tel=window.sessionStorage.editUser;
     Request('GET','/ajax/getusermessage/'+tel).then((response)=>{
       console.log(response);
@@ -26,6 +23,7 @@ class EditUser extends React.Component {
         'success':true
       });
     })
+    
   }
   
   getMajor = (schoolKey)=>{
@@ -58,9 +56,17 @@ class EditUser extends React.Component {
   render() {
     return (
     <MyLayout>
+  
       {
         this.state.success?<Layout className="me-contains" >
+          
         <Form onFinish={this.onSave}>
+            <Breadcrumb>
+              <Breadcrumb.Item>
+                <a href="/user">用户列表</a>
+              </Breadcrumb.Item>
+              <Breadcrumb.Item>编辑用户</Breadcrumb.Item>
+            </Breadcrumb>
             <Item name="userId" initialValue={this.state.user.userId} />
             <Item name="role" initialValue={this.state.user.role} />
             <Row>
