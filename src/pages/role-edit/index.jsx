@@ -2,7 +2,7 @@ import React  from 'react' ;
 import BaseList from '../../component/base-list';
 import MyLayout from '../../component/my-layout';
 import {Layout,Row,Button,Form,Checkbox,Modal,Input} from 'antd';
-import { Request } from '../../component/service/axios-service';
+import { getLocalData, Request } from '../../component/service/axios-service';
 
 
 
@@ -105,7 +105,7 @@ class RoleEdit extends React.Component {
         console.log('delete',response);
       });
     }
-    
+    if(getLocalData('user').role==info.roleId) window.sessionStorage.removeItem('rightnow');
   }
   renderCheckbox = (index)=>{
     const {list}=this.state;

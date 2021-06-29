@@ -1,9 +1,10 @@
 import React  from 'react' ;
 import MyLayout from '../../../component/my-layout';
-import { Request } from '../../../component/service/axios-service';
+import { errorModal, getLocalData, Request } from '../../../component/service/axios-service';
 import { Button, Row, Col,Modal,Form,Input } from 'antd';
 import {PlusOutlined,MinusOutlined,CloseOutlined} from '@ant-design/icons';
 import BaseList from '../../../component/base-list';
+import { Link } from 'react-router-dom';
 const initList = require("../../../../static/teacher.json");
 const ROLE=['管理员','教师','学生'];
 
@@ -34,12 +35,15 @@ class UserList extends React.Component {
         'selectedRowKey':data
       })
     }
-    renderOption  = (e) => {
+    renderOption  = (tel) => {
+      const url="user/edit-user";
         return(
           <Row>
             <Col>
-              <Button type="link">
+              <Button onClick={()=>{ window.sessionStorage.setItem('editUser',tel)}}  type="link">
+                <Link  to={url}>
                   修改
+                </Link>
                 </Button>
             </Col>
             <Col>
@@ -65,11 +69,11 @@ class UserList extends React.Component {
     },{
         title:'专业',key:'major',dataIndex:'depart',
     },{
-        title:'角色',key:'role',dataIndex:'role',
-        render:(val)=>{return ROLE[val]}
+        title:'角色',key:'roleTrans',dataIndex:'role',
+        render:(val)=>{ console.log('rolechange',val); return getLocalData('roleTrans')["_"+String(val)]}
     },{
-        title:'操作',key:'options',
-        render:(e)=>{return this.renderOption(e)}
+        title:'操作',key:'options',dataIndex:'tel',
+        render:(val)=>{return this.renderOption(val)}
     }];
 
     return (

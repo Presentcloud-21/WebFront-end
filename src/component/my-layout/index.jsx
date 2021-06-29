@@ -13,7 +13,8 @@ import {
 import PropTypes from 'prop-types';
 import MySider from '../my-sider';
 import MyHeader from '../my-header';
-import { getDirection } from '../service/direction-service';
+import {getRoleRight, getDirection, getRoleRightbyId } from '../service/direction-service';
+import { getLocalData } from '../service/axios-service';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -30,6 +31,8 @@ class MyLayout extends React.Component {
   constructor(props) {
     super(props);
     getDirection();
+    getRoleRight();
+    
     console.log('mylayout',props);
   }
 

@@ -22,7 +22,7 @@ class MyHeader extends React.Component {
           <Avatar style={{top:0}} size="middle" src={this.state.avatar}  />
         </Col>
         <Col>
-          <Button type="link"> 
+          <Button type="link" onClick={()=>{window.location.href="/me"}}> 
             {JSON.parse(window.sessionStorage.user).userName}
           </Button>
         </Col>

@@ -188,7 +188,7 @@ class Login extends  React.Component {
           </Row>
         </Form>
       </Row>
-      <Button className="to-sign-up" href="sign-up" size="middle">没有账号？现在注册</Button>
+      <Button className="to-sign-up" href="#/sign-up" size="middle">没有账号？现在注册</Button>
       <Button className="to-sign-up" onClick={this.onLoginAdmin} size="middle">游客模式(测试用)</Button>
       <Button className="to-sign-up" 
       onClick={this.onGitHub}

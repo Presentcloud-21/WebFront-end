@@ -35,7 +35,7 @@ class PrivaryRoute extends React.Component {
   render() {
     return (
       this.state.isAuthenticated?
-      <Route path={this.state.path}  component={this.state.component} />
+      <Route path={this.state.path}  component={this.state.component} exact={this.state.exact} />
       :
       <Redirect to={{pathname:"/"}} />
     );
