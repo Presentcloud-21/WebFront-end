@@ -1,7 +1,7 @@
 import React  from 'react' ;
-import LoginLayout from '../../../component/login-component/login-layout';
+import LoginLayout from '../../../component/login-layout';
 import './index.scss'
-import { Row , Input , Button , Form, Col,Spin} from 'antd'
+import { Row , Input , Radio, Button , Form, Col,Spin} from 'antd'
 import { UserOutlined , LockOutlined , MailOutlined , MobileOutlined ,LoadingOutlined, LockFilled } from '@ant-design/icons'
 import { errorModal, Request, successMessage } from '../../../component/service/axios-service';
 
@@ -60,7 +60,7 @@ class SignUp extends  React.Component {
       errorModal('验证码发送失败','请先输入手机号码');
       return;
     } 
-    Request('POST','/ajax/signupsendSms/'+this.state.tel,JSON.stringify({})).then((response)=>{
+    Request('POST','/ajax/sendSms/signupsendSms/'+this.state.tel).then((response)=>{
       const {data}=response;
       if(data.success) {
         this.onCount(60);
@@ -81,6 +81,12 @@ class SignUp extends  React.Component {
           onFinish={this.onFinish}
           onFinishFailed={this.onFinishFail}
         >
+          <Item name='roleId'>
+              <Radio.Group  defaultValue={13}>
+                <Radio value={13} style={{color:'white'}}>学生注册</Radio>
+                <Radio value={14} style={{color:'white'}}>教师注册</Radio>
+              </Radio.Group>
+          </Item>
           <Item name="userName" rules={[{ required: true, message: '请输入用户名' }]}>
             <Input className="half-opacity" size="large"  allowClear placeholder="用户名" prefix={<UserOutlined />}/>
           </Item>
@@ -107,6 +113,7 @@ class SignUp extends  React.Component {
                   </Col>
                 </Row>
               </Item>
+          
           <Item name="userPassward" hasFeedback rules={[{ required: true, message: '请输入密码' }]}>
             <Input.Password className="half-opacity" size="large"  allowClear placeholder="设置密码" prefix={<LockOutlined/>}/>
           </Item>
@@ -128,7 +135,6 @@ class SignUp extends  React.Component {
                 ]}>
             <Input.Password className="half-opacity" size="large"  allowClear placeholder="确认密码" prefix={<LockFilled/>}/>
           </Item>
-          <Item name="role" initialValue={6}/>
           <Item>
             <Button className="sign-up" htmlType="submit" size="middle">现在注册</Button>
             <Button className="to-login" href="/login"  size="middle">已有账号？现在登录</Button>

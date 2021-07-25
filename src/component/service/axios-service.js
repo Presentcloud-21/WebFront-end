@@ -5,24 +5,27 @@ axios.interceptors.request.use(
 
       console.log('request success:',config);
       let token = window.localStorage.getItem('token');
-      config.headers.Authorization = token;
+      if(token!=undefined && token!=null) {
+        config.headers.Authorization = token;
+      }
       
       return config;
     },(error)=> {
-      // console.log('request error:',error);
+      console.log('request error:',error);
       return Promise.reject(error);
     }
   )
   
+  
   axios.interceptors.response.use(
     (response)=>{
-      // console.log('response suceess:',response);
+      console.log('response suceess:',response);
       return response;
     },(error)=>{
       const code=error.response.status;
-      // console.log('response error:',code);
+      console.log('response error:',code);
       switch(code) {
-        case 401:window.location.href-'/login';break;
+        case 401:window.location.href='/login';break;
         // case 404:window.location.href='/status404';break;
         // case 502:window.location.href='/status502';break;
         // case 504:window.location.href='/status504';break;
@@ -32,7 +35,7 @@ axios.interceptors.request.use(
   )
   axios.defaults.headers.post['Content-Type']="application/json";
 export async function AddToken(token) {
-  console.log('token',token);
+  // console.log('token',token);
   window.localStorage.setItem('token',token);
 }
 export function getLocalData(code) {
@@ -53,7 +56,11 @@ export async function Request(method,target,data) {
     //   alert(info.msg);
     // }
     
-    // console.log('request data',info);
+    console.log('request data',info);
+    if(info.data.msg==='令牌验证失败') {
+      errorModal('未登录','请先登陆后操作');
+      window.location.href="/login";
+    }
     return info;
 }
 

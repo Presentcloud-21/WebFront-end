@@ -5,7 +5,7 @@ import './index.scss';
 class Home extends React.Component {
   constructor(props) {
     super(props);
-    getDirection();
+    // getDirection();
   }
   render() {
     return (

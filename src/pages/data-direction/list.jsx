@@ -1,11 +1,8 @@
-import React, { useState } from 'react';
-import { Input,Form,Tag, Cascader ,Radio, Select,Row,Col, Button, Table, Modal ,Popconfirm, InputNumber } from 'antd';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Input,Form,Tag, Cascader ,Radio,Row,Col, Button, Table, Modal ,Popconfirm, InputNumber } from 'antd';
 import './index.scss'
 import { Request } from '../../component/service/axios-service';
-import {DndProvider} from 'react-dnd'
-import { getDirection } from '../../component/service/direction-service';
-const { Option } = Select;
+import { checkRight } from '../../component/service/menu-service';
 const { Column } = Table;
 
 const STATE={"default":'0',"add":'1','edit':'2','delete':'3'};
@@ -20,7 +17,8 @@ class List extends React.Component {
       'pId':props.pId,
       'hasChange':false,
       'list':[],
-      'transform':[]
+      'transform':new Map(),
+      'editable':checkRight('editDictation'),
     };
     this.onInit(props);
   }
@@ -36,7 +34,7 @@ class List extends React.Component {
       });
       this.setState({
         'plist':data,
-        'transfrom':json
+        'transform':json
       });
     });
     }
@@ -59,7 +57,6 @@ class List extends React.Component {
   }
 
   componentWillReceiveProps(props) {
-    console.log('mount',props);
     this.onInit(props);
   }
 
@@ -70,7 +67,6 @@ class List extends React.Component {
       const data={'value':list[i].dictionaryDetailId,'label':list[i].itemValue}
       res.push(data);
     }
-    console.log('option',res);
     return res;
   }
 
@@ -91,7 +87,6 @@ class List extends React.Component {
           okText="删除"
           cancelText="取消"
           onConfirm={()=>{
-          console.log("text: ",text);console.log("record: ",record);console.log("index: ",index);
           this.onDelete(index);
         }}>
           <Button type="link">删除</Button>
@@ -102,9 +97,7 @@ class List extends React.Component {
   }
 
   validKey = (rule, value, callback) => {
-    console.log('keyCheck',value);
     this.state.list.map((i)=>{
-      console.log(i.itemKey,'==',value,i.itemKey === value);
       if(i.itemKey === value) {
         callback('数据编号重复')
       }
@@ -113,7 +106,6 @@ class List extends React.Component {
   }
 
   validValue = (rule, value, callback,index) => {
-    console.log('r',rule);
     this.state.list.map((i)=>{
       if(i.itemKey!=index && i.itemValue === value) {
         callback('数据名称重复')
@@ -137,7 +129,6 @@ class List extends React.Component {
 
   onDelete = (index)=> {
     let list=[...this.state.list];
-    console.log('delete',index);
     list[index].updateflag=STATE.delete;
     this.setState({
       'list':list,
@@ -150,7 +141,6 @@ class List extends React.Component {
     if(l!=null) {
       e.detailpId=l[l.length-1];
     }
-    console.log('onAdd',e);
     if(e.isdefault==1) {
       this.resetDefault(-1);
     } else {
@@ -167,13 +157,11 @@ class List extends React.Component {
       'list':list,
       'hasChange':true
     });
-    console.log(this.state.list);
     callback();
   }
   
   onAddDirectionData = ()=>{
     const option = this.onGetOption(this.state.plist);
-    console.log('super plist',option);
     const modal = Modal.confirm();
     const destroy =  ()=> {
       modal.destroy();
@@ -203,7 +191,7 @@ class List extends React.Component {
             <div>
           请选择上级明细
           <Form.Item name="detailpId" rules={[{ required: true, message: '上级明细不能为空' }]} >
-          <Cascader options={option} onChange={(e)=>{console.log(e);}} placeholder="请选择上级明细" />
+          <Cascader options={option}  placeholder="请选择上级明细" />
           </Form.Item>
             </div>
           }
@@ -224,8 +212,7 @@ class List extends React.Component {
     });
   }
   onEdit = (e,index,callback)=> {
-    console.log('edit',e);
-    console.log('index',index);
+
     if(e.isdefault == 1) {
       this.resetDefault(index);
     } else {
@@ -299,7 +286,9 @@ class List extends React.Component {
           {
             this.state.hasChange?<Button onClick={this.onSave} type="danger" style={{color:'white'}} >保存</Button>:null
           }
-          <Button type="primary" onClick={this.onAddDirectionData} className="add-direcetion">新增字典明细</Button>
+          {
+            this.state.editable?<Button type="primary" onClick={this.onAddDirectionData} className="add-direcetion">新增字典明细</Button>:null
+          }
         <Col>
           <Table  bordered pagination={false} className="direction-table" dataSource={this.state.list}  scroll={{ y: 300 }}>
             <Column title="数据编号" key="key" dataIndex="itemKey" />
@@ -309,10 +298,12 @@ class List extends React.Component {
             {
               this.state.pId == 0?null:
               <Column title="所属" key="detailpId" dataIndex="detailpId"
-              render={(value)=>{return this.state.transfrom.get(value)}} 
+              render={(value)=>{return this.state.transform.get(value)}} 
               />
             }
-            <Column dataIndex="option" width={200} key="option" render={this.renderOption} />
+            {
+              this.state.editable?<Column dataIndex="option" width={200} key="option" render={this.renderOption} />:null
+            }
           </Table>
         </Col>
        

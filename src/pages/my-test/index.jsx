@@ -1,10 +1,8 @@
 import React  from 'react' ;
 import MyLayout from '../../component/my-layout'
-import {Button,Form,Table,Checkbox, Cascader,Radio,Input} from 'antd';
-import {errorMesseage, Request} from '../../component/service/axios-service';
-import {transformDirectionData} from '../../component/service/direction-service';
-import { sortableContainer, sortableElement, sortableHandle } from 'react-sortable-hoc';
-import { MenuOutlined } from '@ant-design/icons';
+import {Button,Form,Table,Input} from 'antd';
+import { errorModal, Request } from '../../component/service/axios-service';
+
 
 const {Item}=Form;
 const {Column} = Table;
@@ -12,26 +10,35 @@ const {Column} = Table;
 class MyTest extends React.Component {
   constructor(props) {
     super(props);
+    this.state={
+      'data':[]
+    }
   }
 
  
   onfinish = (e)=> {
-    errorMesseage('标题','详情')
+    Request('GET',e.url).then((response)=>{
+      const {data}=response.data;
+      console.log(data);
+      this.setState({
+        'data':data
+      })
+    })
   }
  
 
   render() {
     return (
-    <MyLayout>
+    // <MyLayout>
       <Form
-      onFinish={(e)=>{console.log(e);}}
+      onFinish={this.onfinish}
       >
-        <Form.Item name="i" onChange={(e)=>{console.log(e);}}>
-          <Checkbox key="1" value="2"  >d</Checkbox>
+        <Form.Item name="url">
+          <Input />
         </Form.Item>
         <Button htmlType="submit" >测试</Button>
       </Form>
-    </MyLayout>
+    // </MyLayout>
   );
   }
   

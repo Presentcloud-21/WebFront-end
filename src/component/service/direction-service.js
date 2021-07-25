@@ -1,4 +1,3 @@
-import './config'
 import { Request } from './axios-service';
 let direction={};
 
@@ -20,6 +19,7 @@ export function hasDirectionKey(code) {
 export async function getDirection() {
     const response = await Request('GET','/ajax/dictionary');
     const {data}=response.data;
+    // console.log('dictation',response);
     const res = await addDirection(data);
     window.sessionStorage.setItem('dictation',JSON.stringify(res));
 }
@@ -30,35 +30,71 @@ export function getDictationbyCode(code) {
     }
     return null;
 }
-export function getRoleRight(){
-    Request('GET','/ajax/roleright/rightList').then((response)=>{
-        const {data} = response.data;
-        let res={};
-        for(let i=0;i<data.length;++i) {
-            res[data[i].rightName]=data[i].rightId;
-        }
-        console.log('rightList',res);
-        window.sessionStorage['roleright']=JSON.stringify(res);
-    })
-}
 export async function getRole(){
-        return new Promise((resolve,reject)=>{
-            Request('GET','/ajax/roleright/roleList').then(async (response)=>{
-            let {data} = response.data;
-            let res=[];
-            let dir={};
-            for(let i=0;i<data.length;++i) {
-              res.push({'roleDes':data[i].roleDes,'roleId':data[i].roleId});
-              dir["_"+data[i].roleId]=data[i].roleDes;
-            }
-            window.sessionStorage.setItem('role',JSON.stringify(res));
-            window.sessionStorage.setItem('roleTrans',JSON.stringify(dir));
-            resolve();
-          });
-        });
+    return new Promise((resolve,reject)=>{
+        Request('GET','/ajax/roleright/roleList').then(async (response)=>{
+        let {data} = response.data;
+        let res=[];
+        let dir={};
+        for(let i=0;i<data.length;++i) {
+          res.push({'roleDes':data[i].roleDes,'roleId':data[i].roleId});
+          dir["_"+data[i].roleId]=data[i].roleDes;
+        }
+        window.sessionStorage.setItem('role',JSON.stringify(res));
+        window.sessionStorage.setItem('roleTrans',JSON.stringify(dir));
+        resolve();
+      });
+    });
 }
+// export function getRoleRight(){
+//     Request('GET','/ajax/roleright/rightList').then((response)=>{
+//         const {data} = response.data;
+//         let res={};
+//         for(let i=0;i<data.length;++i) {
+//             res[data[i].rightName]=data[i].rightId;
+//         }
+//         console.log('rightList',res);
+//         window.sessionStorage['roleright']=JSON.stringify(res);
+//     })
+// }
+// export async function getRoleRightbyId(Id){
+//     if(Id==0) return [];
+//         const a1=new Promise((resolve,reject)=>{
+//             Request('GET','/ajax/roleright/getRoleById/'+Id).then(async (response)=>{
+//                 const data = response.data.data.rolerights;
+//                 console.log('my role',data);
+//                 let res=[];
+//                 for(let i=0;i<data.length;++i) {
+//                     res.push(data[i].rightId);
+//                 }
+//                 resolve(res);
+//             });
+//         })
+//         const a2=new Promise((resolve,reject)=>{
+//             Request('GET','/ajax/roleright/roleList').then(async (response)=>{
+//             let {data} = response.data;
+//             let res=[];
+//             let dir={};
+//             for(let i=0;i<data.length;++i) {
+//               res.push({'roleDes':data[i].roleDes,'roleId':data[i].roleId});
+//               dir["_"+data[i].roleId]=data[i].roleDes;
+//             }
+//             window.sessionStorage.setItem('role',JSON.stringify(res));
+//             window.sessionStorage.setItem('roleTrans',JSON.stringify(dir));
+
+//             resolve();
+//           });
+//         });
+//         return new Promise((resolve,reject)=>{
+//             Promise.all([a1,a2]).then((e)=>{
+//                 resolve(e[0]);
+//             })
+//         });
+    
+// }
 function  addDirection(list) {
-    let dictation={};
+    if(list.length==0) return [];
+    let dictation={}; 
     let request=[];
     for(let i = 0;i<list.length;++i) {
         request[i]=new Promise((resolve,reject)=>{

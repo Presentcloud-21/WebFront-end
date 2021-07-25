@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import {Input, InputNumber,Form, Radio, Select,Row,Col, Button, Table, Modal, Popconfirm } from 'antd';
+import React from 'react';
+import {Input,Form,Row,Col, Button, Table, Modal, Popconfirm } from 'antd';
 import './index.scss'
 import { Request } from '../../component/service/axios-service';
 import { PlusOutlined } from '@ant-design/icons'
+import { checkRight } from '../../component/service/menu-service';
 const { Column } = Table;
 class List extends React.Component {
   constructor(props) {
     super(props);
     this.state={
-      'list':[]
+      'list':[],
+      'editable':checkRight('editSysparam')
     }
     Request('GET','/ajax/syspara').then((response)=>{
       const {data}=response.data;
@@ -16,7 +18,6 @@ class List extends React.Component {
       this.setState({
         'list':data
       });
-      console.log('mydata2',this.state.list);
     });
   }
 
@@ -49,7 +50,7 @@ class List extends React.Component {
   validHintname = (rule, value, callback,index) => {
     const list = this.state.list;
     for(let i = 0;i<list.length;++i) {
-      if(i!=index && list[i].hintname === value) {
+      if(i!==index && list[i].hintname === value) {
         callback('参数名称重复')
       }
     }
@@ -59,7 +60,7 @@ class List extends React.Component {
   validKeyword = (rule, value, callback,index) => {
     const list = this.state.list;
     for(let i = 0;i<list.length;++i) {
-      if(i!=index && list[i].keyword === value) {
+      if(i!==index && list[i].keyword === value) {
         callback('参数名称重复')
       }
     }
@@ -176,12 +177,17 @@ class List extends React.Component {
     return (
       <Row className='system-param-contains'>
           <p className="system-param-title"><strong>系统参数</strong></p>
-          <Button type="primary" onClick={this.onAddParam} style={{right:'24px'}}>新增系统参数<PlusOutlined /></Button>
+          {
+            this.state.editable?<Button type="primary" onClick={this.onAddParam} style={{right:'24px'}}>新增系统参数<PlusOutlined /></Button>:null
+          }
           <Table  bordered pagination={false} className="system-param-table" dataSource={this.state.list} >
             <Column title="参数名称" key="name" dataIndex="hintname" />
             <Column title="参数关键字" key="keyword" dataIndex="keyword" />
             <Column title="参数值" key="value" dataIndex="value"/>
-            <Column dataIndex="option" width={200} key="option" render={this.renderOption} />
+            {
+              this.state.editable?<Column dataIndex="option" width={200} key="option" render={this.renderOption} />:null
+
+            }
           </Table>       
       </Row>
   );

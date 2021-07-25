@@ -1,89 +1,60 @@
 import React  from 'react' ;
 import MyLayout from '../../../component/my-layout';
-import { Upload,Space,Avatar,Menu,Switch, Layout,Input,Select,Tag,Row,Col,Button,Popconfirm,Modal,Form } from 'antd'
-import { getLocalData, Request } from '../../../component/service/axios-service';
+import { Menu, Layout,Tag,Row,Col,Button,Popconfirm } from 'antd'
+import { getLocalData, Request, successMessage } from '../../../component/service/axios-service';
 import BaseList from '../../../component/base-list';
 import { getDictationbyCode } from '../../../component/service/direction-service';
 import { Link } from 'react-router-dom';
+import { checkRight } from '../../../component/service/menu-service';
 
 const STATE=[<Tag color="error">未开始</Tag>,<Tag color="success">正在执行</Tag>,<Tag color="default">已结课</Tag>];
 const JONIABLE =["",<Tag color="error">否</Tag>,<Tag color="success">是</Tag>]
-const MODEURL = {'join':'joinlist/','create':'createlist/','all':'getallcourse'};
 
 class ClassList extends React.Component {
   constructor(props) {
     super(props);
     this.state={
-      'list':[],
-      'majorlist':[],
-      'user':getLocalData('user'),
-      'avatar':''
+      'current':props.current || 'joined',
+      'hasOptions':props.hasOptions || false,
+      'list':props.list || [],
+      'isSelection':props.isSelection || false,
+      'hasDeleted':props.hasDeleted || false,
+      'created':checkRight('getCreatedClass'),
+      'all':checkRight('getAllClass'),
+      'deleteCreatedClass':checkRight('deleteCreatedClass'),
+      'deleteAllClass':checkRight('deleteAllClass'),
+      'creatable':checkRight('createClass')
     }
-    Request('GET','/ajax/joinlist/'+getLocalData('user').userId).then((response)=> {
-      const {data} = response.data;
-      this.setState({
-        'list':data || [],
-        'current':'join'
-      });
-      console.log('all user',this.state.list);
-    })
+  }
+  componentWillReceiveProps(props) {
+    this.props=props;
+    this.setState({
+      'current':props.current || 'joined',
+      'hasOptions':props.hasOptions || false,
+      'list':props.list || [],
+      'isSelection':props.isSelection || false,
+      'hasDeleted':props.hasDeleted || false,
+      'created':checkRight('getCreatedClass'),
+      'all':checkRight('getAllClass'),
+      'deleteCreatedClass':checkRight('deleteCreatedClass'),
+      'deleteAllClass':checkRight('deleteAllClass'),
+      'creatable':checkRight('createClass')
+
+    });
   }
   onChagneMode =(e) => {
-    console.log(e);
-    let url='/ajax/'+MODEURL[e.key];
-    if(e.key!='all') {
-      url+=getLocalData('user').userId;
-    }
-    Request('GET',url).then((response)=>{
-      const {data}=response.data;
-      this.setState({
-        'current':e.key,
-        'list':data || []
-      });
-    })
+    window.location.href="/class/"+e.key+"-list";
   }
-  getMajor = (schoolKey)=>{
-    getDictationbyCode('school').map((i)=>{
-      console.log(i);
-      if(i.itemKey==schoolKey) {
-        Request('GET','/ajax/dictionary/dictionarydetailbypid/'+i.dictionaryDetailId).then((response)=>{
-          const {data}=response.data;     
-          this.setState({
-            'majorlist':data,
-          });
-          console.log(this.state.majorlist);
-        });
-      }
-    })
-  }
-  onAdd(e,callback) {
-    console.log(e);
-    e.joinable=e.joinable?1:0;
-    e.isschoolclass=e.isschoolclass?1:0;
-    Request('POST','/ajax/creatclass',JSON.stringify(e)).then((response)=>{
-      console.log(response);
-    })
-    callback();
-  }
-  customRequest=(option)=> {
-    const formData = new FormData();
-    formData.append("files[]", option.file);
-    const reader = new FileReader();
-    reader.readAsDataURL(option.file);
-    reader.onloadend = function(e) {
-      console.log(e.target.result);// 打印图片的base64
-      if (e && e.target && e.target.result) {
-        option.onSuccess();
-      }
-    };
-    return e.target.result;
-  }
+
 
   renderButton = () => {
     return(
-        <Button.Group>
-            <Button type="primary"><Link to="/class/add-class">新建班课</Link></Button>
-            <Button type="danger" style={{margin:'0px 24px'}}>批量删除班课</Button>
+        <Button.Group style={{marginLeft:'auto'}}>
+          {
+            this.state.creatable?
+            <Button type="primary"><Link to="/class/add-class">新建班课</Link></Button>:null
+          }
+            {/* <Button type="danger" style={{margin:'0px 24px'}}>批量删除班课</Button> */}
         </Button.Group>
     )
 }
@@ -95,10 +66,11 @@ class ClassList extends React.Component {
   }
 
   renderOption  = (e) => {
-    
     return(
       <Row>
-        <Col>
+        {
+          (this.state.deleteAllClass)||(this.state.deleteCreatedClass&&e.userId==JSON.parse(window.sessionStorage.user)['userId'])?
+          <Col>
         <Popconfirm  
           title="是否确认删除该数据？"
           okText="删除"
@@ -112,11 +84,14 @@ class ClassList extends React.Component {
               this.setState({
                 "list":list
               });
+              successMessage('删除成功');
             }
           })}}>
             <Button type="link">删除</Button>
           </Popconfirm>
-        </Col>
+        </Col>:null
+        }
+        
       </Row>
       );
   }
@@ -145,37 +120,38 @@ class ClassList extends React.Component {
       title:'课程状态',key:'coursestate',dataIndex:'coursestate',
       render:(status)=>{return STATE[status]}
   },{
-      title:'操作',key:'options',
-      render:(e)=>{return this.renderOption(e)}
+      title:'',key:'options',
+      render:(e)=>{return this.state.hasDeleted?this.renderOption(e):null}
   }];
 
     return (
     <MyLayout>
-      <Layout>
-        <Menu mode="horizontal" onClick={this.onChagneMode} selectedKeys={[current]}>
-          <Menu.Item key="join">
+        <Menu style={{'margin':'10px 24px'}} mode="horizontal" onClick={this.onChagneMode} selectedKeys={[current]}>
+          <Menu.Item key="joined">
             我加入的班课
           </Menu.Item>
-          <Menu.Item key="create">
-            我创建的班课
-          </Menu.Item>
-          <Menu.Item key="all">
-            班课列表
-          </Menu.Item>
-        </Menu>
-        <Row style={{backgroundColor:"white"}}>
           {
-            this.state.current == "all"?
-            <Col style={{marginLeft:'auto'}}>
-              {this.renderButton()}
-            </Col>
-            :null
+            this.state.created?
+            <Menu.Item key="created">
+            我创建的班课
+          </Menu.Item>:null
           }
-        </Row>
+          {
+            this.state.all?
+            <Menu.Item key="all">
+            班课列表
+          </Menu.Item>:null
+          }
+        </Menu>
+        {
+          this.state.hasOptions?
+          <Row style={{backgroundColor:"white",'margin':'0px 24px'}}>
+              {this.renderButton()}
+          </Row>:null
+        }
         <Row>
-          <BaseList list={this.state.list} columns={columns} isSelection={true}  />
+          <BaseList list={this.state.list} columns={columns} isSelection={this.state.isSelection}  />
         </Row>
-      </Layout>
     </MyLayout>
   );
   }

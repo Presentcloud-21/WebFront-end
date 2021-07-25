@@ -6,21 +6,24 @@ import {PlusOutlined} from '@ant-design/icons'
 import './index.scss'
 import { Request } from '../../component/service/axios-service';
 import { getDirection } from '../../component/service/direction-service';
-const initList=[];
+import { checkRight, errorRight } from '../../component/service/menu-service';
 const { SubMenu } = Menu;
 const { Item } = Menu;
 
 class DataDirection extends React.Component {
   constructor(props) {
     super(props);
+    if(!checkRight('getDictation')) {
+      errorRight();
+    }
     this.state={
       'selected_key':0,
       'selected_code':'',
       'selected_pId':0,
       'list':[],
+      'editable':checkRight('editDictation')
     };
     Request('GET','/ajax/dictionary').then((response)=>{
-      console.log(response);
       const {data}=response.data;
       this.setState({
         'list':data
@@ -33,7 +36,6 @@ class DataDirection extends React.Component {
 
   }
   componentDidMount() {
-    getDirection();
   }
 
   onSelectType = (e,list)=>{
@@ -60,9 +62,7 @@ class DataDirection extends React.Component {
       e.pId=list[i];
       break;
     }
-    console.log(e,typeof e.pId);
     Request('POST','/ajax/dictionary/adddic/',JSON.stringify(e)).then((response)=>{
-      console.log('add new type',response);
       callback();
       window.location.reload();
     })
@@ -75,18 +75,16 @@ class DataDirection extends React.Component {
       const data={'value':list[i].dictionaryId,'label':list[i].dictionaryDescribe,'children':this.onGetOption(list[i].child)}
       res.push(data);
     }
-    console.log('option',res);
     return res;
   }
 
   onGetMenu = (data) => {
-    console.log(data);
     return (
       data.child==null?
-      <Item key={data.dictionaryId} onClick={(e)=>{console.log(e);}} title={data.dictionaryDescribe}>{data.dictionaryDescribe}</Item>
+      <Item key={data.dictionaryId}  title={data.dictionaryDescribe}>{data.dictionaryDescribe}</Item>
       :
-      <SubMenu  title={data.dictionaryDescribe}>
-        <Item key={data.dictionaryId} onClick={(e)=>{console.log(e);}} title={data.dictionaryDescribe}>{data.dictionaryDescribe}</Item>
+      <SubMenu key={1}  title={data.dictionaryDescribe}>
+        <Item key={data.dictionaryId}  title={data.dictionaryDescribe}>{data.dictionaryDescribe}</Item>
         {
           data.child.map((i)=>{
             return this.onGetMenu(i)
@@ -99,7 +97,6 @@ class DataDirection extends React.Component {
 
 
   validDescribe = (rule, value, callback) => {
-    console.log('v',value);
     this.state.list.map((i)=>{
       if(i.dictionaryDescribe === value) {
         callback('字典名称重复')
@@ -109,7 +106,6 @@ class DataDirection extends React.Component {
   }
 
   validCode = (rule, value, callback) => {
-    console.log('v',value);
     this.state.list.map((i)=>{
       if(i.dictionaryCode === value) {
         callback('关键字重复')
@@ -120,7 +116,6 @@ class DataDirection extends React.Component {
 
   onAddDirectionType = ()=>{
     const option = this.onGetOption(this.state.list);
-    console.log(option);
     const modal = Modal.confirm();
     const destroy =  ()=> {
       modal.destroy();
@@ -147,7 +142,7 @@ class DataDirection extends React.Component {
           </Form.Item>
           请选择上级菜单
           <Form.Item name="pId" initialValue={[0]}>
-          <Cascader options={option} onChange={(e)=>{console.log(e);}} placeholder="请选择上级菜单" />
+          <Cascader options={option} placeholder="请选择上级菜单" />
           </Form.Item>
           <Button type="primary" htmlType="submit">提交</Button>
           <Button type="danger" className="modal_cancel" onClick={()=>{modal.destroy()}}>取消</Button>
@@ -172,7 +167,10 @@ class DataDirection extends React.Component {
             })
           }
         </Menu>
-        <Button type='danger' onClick={this.onAddDirectionType} style={{width:'100%',color:'white'}} >添加字典类型 <PlusOutlined/></Button>
+        {
+          this.state.editable?
+          <Button type='danger' onClick={this.onAddDirectionType} style={{width:'100%',color:'white'}} >添加字典类型 <PlusOutlined/></Button>:null
+        }
       </Col>
       <Col className="direction-contains">
         {

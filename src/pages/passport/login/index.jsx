@@ -1,7 +1,7 @@
 import React  from 'react' ;
-import LoginLayout from '../../../component/login-component/login-layout';
+import LoginLayout from '../../../component/login-layout';
 import './index.scss'
-import { Row ,Spin,Col, Input , Radio , Checkbox , Button , Form} from 'antd'
+import { Checkbox, Row ,Spin,Col, Input , Radio , Button , Form} from 'antd'
 import { UserOutlined , LockOutlined, MobileOutlined,LoadingOutlined  } from '@ant-design/icons'
 import { AddToken, errorModal, Request, successMessage } from '../../../component/service/axios-service';
 
@@ -13,8 +13,14 @@ class Login extends  React.Component {
     this.state=({
       'LoginType':'password',
       'tel':'',
+      'autoLogin':false,
       'second':0
     });
+    const Login_Time=window.localStorage.getItem('Login_Time');
+    if(Login_Time!=undefined &&Login_Time!=null&& new Date().getTime()<Login_Time) {
+      successMessage('自动登录成功');
+      this.onLogin(window.localStorage.getItem('user_tel'));
+    }
     const GithubCode=window.location.search.substring(6).split('&')[0];
     console.log(GithubCode);
     if(GithubCode != '') {
@@ -43,11 +49,16 @@ class Login extends  React.Component {
   }
 
   onFinish = (values) =>  {
-    Request('POST','/ajax/login',JSON.stringify(values)).then((response)=>{
+    const url=this.state.LoginType=='password'?'/ajax/login':'ajax/sendSms/loginbytel';
+    Request('POST',url,JSON.stringify(values)).then((response)=>{
       const {data}=response;
       console.log("Signup respond:",data);
       if(data.success) {
         successMessage('登录成功');
+        if(this.state.autoLogin) {
+          window.localStorage.setItem('Login_Time',new Date().getTime()+1000*60*10);//10分钟内自动登录
+          window.localStorage.setItem('user_tel',values.tel);
+        }
         AddToken(data.token);
         this.onLogin(this.state.tel);
       } else  {
@@ -128,7 +139,6 @@ class Login extends  React.Component {
           <Radio className="radio-item" value="captcha">验证码登录</Radio>
         </Radio.Group>
       </Row>
-      <Row>
         <Form 
           name="login" 
           className="form"
@@ -141,46 +151,57 @@ class Login extends  React.Component {
           </Item>
           {
             this.state.LoginType=='password'?
-            <div>
-              <Item name="userPassward" rules={[{ required: true, message: '请输入密码' }]}>
-                <Input.Password className="half-opacity" size="large"  allowClear placeholder="密码" prefix={<LockOutlined/>}/>
-              </Item>
-              < Item name="code" initialValue={''} />
-            </div>
+            <Row>
+              <Col>
+                <Item name="userPassward" rules={[{ required: true, message: '请输入密码' }]}>
+                  <Input.Password className="half-opacity" size="large"  allowClear placeholder="密码" prefix={<LockOutlined/>}/>
+                </Item>
+              </Col>
+              <Col>
+                < Item name="code" initialValue={''} />
+              </Col>
+            </Row>
               :
-              <Item>
-                <Row>
-                  <Col span={12}>
-                    <Item name="code"  rules={[{ required: true, message: '请输入验证码' }]} >
-                      <Input className="half-opacity" size="large" allowClear placeholder="验证码" prefix={<MobileOutlined />}/>
-                    </Item>
-                    < Item name="userPassward" initialValue={''} /> 
-                  </Col>
-                  <Col span={6}>
-                    <Item>
-                      {
-                        this.state.second == 0?
-                        <Button className="captcha-button" onClick={this.sendSms}   size="large">发送验证码</Button>
-                        :
-                        <Button disabled   size="large"><Spin indicator={<LoadingOutlined /> }>{this.state.second}</Spin></Button>
-                      }
-                    </Item>
-                  </Col>
-                </Row>
-              </Item>
+              <Row>
+                <Col span={12}>
+                  <Row>
+                    <Col>
+                      <Item name="code"  rules={[{ required: true, message: '请输入验证码' }]} >
+                        <Input className="half-opacity" size="large" allowClear placeholder="验证码" prefix={<MobileOutlined />}/>
+                      </Item>
+                    </Col>
+                    <Col>
+                      < Item name="userPassward" initialValue={''} /> 
+                    </Col>
+                  </Row>  
+                </Col>
+                <Col span={6}>
+                  <Item>
+                    {
+                      this.state.second == 0?
+                      <Button className="captcha-button" onClick={this.sendSms}   size="large">发送验证码</Button>
+                      :
+                      <Button disabled   size="large"><Spin indicator={<LoadingOutlined /> }>{this.state.second}</Spin></Button>
+                    }
+                  </Item>
+                </Col>
+              </Row>
           }
+          <Row>
+            <Checkbox initialValue={this.state.autoLogin} onChange={(e)=>{this.setState({'autoLogin':e.target.checked});}} style={{marginBottom:'20px',color:'white'}}>
+              自动登录
+            </Checkbox>
+          </Row>
           <Row>
             {
               this.state.LoginType=='password'?
               <Item name="forget-password">
-              <Button className="forget-password" size="middle">忘记密码</Button>
+              <Button className="forget-password" href="/forget-password" size="middle">忘记密码</Button>
             </Item>:null
             }
-            
               <Button className="login" htmlType="submit" size="middle">登录账号</Button>
           </Row>
         </Form>
-      </Row>
       <Button className="to-sign-up" href="/sign-up" size="middle">没有账号？现在注册</Button>
       {/* <Button className="to-sign-up" onClick={this.onLoginAdmin} size="middle">游客模式(测试用)</Button> */}
       {/* <Button className="to-sign-up" 

@@ -2,8 +2,10 @@ import React  from 'react' ;
 import MyLayout from '../../component/my-layout'
 import './index.scss';
 import { Space, Row, Col, Input, Layout, Avatar,Button, Upload,Form,DatePicker,Select  } from 'antd';
-import { errorModal, getLocalData, Request } from '../../component/service/axios-service';
+import { errorModal, getLocalData, Request, successMessage } from '../../component/service/axios-service';
 import { getDictationbyCode } from '../../component/service/direction-service';
+import moment from 'moment';
+import { getDefaultUserAvatar } from '../../component/service/default';
 const {Item} = Form;
 class Me extends React.Component {
   constructor(props) {
@@ -12,7 +14,7 @@ class Me extends React.Component {
     this.state={
         'user':user,
         'majorlist':[],
-        'avatar':user.avatar
+        'avatar':user.avatar || getDefaultUserAvatar()
     };
     
     this.getMajor(this.state.user.userschool);
@@ -20,28 +22,26 @@ class Me extends React.Component {
   }
   onSave = (e) =>{
     e['avatar']=this.state.avatar;
+    e.birthyear=e.birthyear.add(+5,'day')
     console.log('update',e);
     Request('POST','/ajax/updateusermessage',JSON.stringify(e)).then((response)=>{
       Request('GET','/ajax/getusermessage/'+this.state.user.tel).then((response)=>{
-        console.log('user data',response);
         const {data}=response.data;
         window.sessionStorage['user'] = JSON.stringify(data);
-        // window.location.reload();
+        successMessage('用户信息修改成功');
+        window.location.reload();
       });
     })
   }
   getMajor = (schoolKey)=>{
     getDictationbyCode('school').map((i)=>{
-      console.log(i);
       if(i.itemKey==schoolKey) {
         Request('GET','/ajax/dictionary/dictionarydetailbypid/'+i.dictionaryDetailId).then((response)=>{
           const {data}=response.data;
           
-          console.log(data);
           this.setState({
-            'majorlist':data,
+            'majorlist':data || [],
           });
-          console.log('majorlist',this.state.majorlist);
         });
       }
     })
@@ -71,13 +71,11 @@ class Me extends React.Component {
   let res;
   reader.onloadend = function(e) {
     res=e.target.result;
-    // console.log(e.target.result);// 打印图片的base64
     if (e && e.target && e.target.result) {
       option.onSuccess();
     }
   };
   this.setState('avatar',res);
-  console.log('avatar',this.state.avatar);
 }
  beforeUpload(file) {
   const isLt2M = file.size / 1024 / 1024 < 2;
@@ -122,7 +120,7 @@ class Me extends React.Component {
                   </Item>
                   学院
                   <Item name="depart" initialValue={this.state.user.depart}> 
-                    <Select onChange={(e)=>{ console.log(e); }}>
+                    <Select>
                       {
                         this.state.majorlist.length==0?<Select.Option key={0} value={0}>未知</Select.Option>:this.state.majorlist.map((i)=>{
                           return <Select.Option key={i.itemKey} value={i.itemKey}>{i.itemValue}</Select.Option>
@@ -136,7 +134,7 @@ class Me extends React.Component {
                   </Item>
                   性别
                   <Item name="sex" initialValue={this.state.user.sex}> 
-                    <Select onChange={(e)=>{ console.log(e); }}>
+                    <Select>
                       {
                         getDictationbyCode('sex').map((i)=>{
                           return <Select.Option key={i.itemKey} value={i.itemKey}>{i.itemValue}</Select.Option>
@@ -145,10 +143,13 @@ class Me extends React.Component {
                     </Select>
                   </Item>
                   出生年份            
-                  <Item name="birthyear" initialValue={moment(this.state.user.birthyear?this.state.user.birthyear.substring(0,4):'1970')} >
+                  <Item name="birthyear" initialValue={moment(this.state.user.birthyear?this.state.user.birthyear.substring(0,4):new Date().getFullYear())} >
                     <DatePicker picker="year" className="me-input" />  
                   </Item>
-                  <Button type="danger" htmlType="submit">修改信息</Button>
+                  <Row>
+                    <Col><Button type="danger" htmlType="submit">修改信息</Button></Col>
+                    <Col><Button href="me/change-password" style={{marginLeft:'24px'}} type="primary" >修改密码</Button></Col>
+                  </Row>
               </Space>
             </Col>
             <Col className="me-avatar-contains">
@@ -162,8 +163,6 @@ class Me extends React.Component {
           <Space  direction="vertical" className="me-info" size="small" align="center">
             <Row>
               <Avatar style={{top:0}} size={108} src={this.state.avatar}  />
-
-              {/* <img src={this.state.avatar} alt="avatar"/> */}
             </Row>
             <Row>
               <Button>更换头像</Button>

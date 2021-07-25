@@ -1,21 +1,9 @@
 import React  from 'react' ;
-import { Layout, Menu,  Alert ,  Button} from 'antd'
 import './index.scss'
-import  { Link } from 'react-router-dom';
-import {
-  DesktopOutlined,
-  PieChartOutlined,
-  FileOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-const{Sider} =  Layout;
-
 class  LoginLayout extends React.Component {
-  
   constructor(props) {
     super(props);
-    console.log('layout',props);
+    // console.log('layout',props);
   }
 
   render() {

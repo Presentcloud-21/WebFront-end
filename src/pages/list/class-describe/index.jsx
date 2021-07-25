@@ -1,10 +1,11 @@
 import React  from 'react' ;
 import MyLayout from '../../../component/my-layout';
 import {Breadcrumb,Form,Upload,Avatar,Space,Select,Input,Switch,Menu, Layout,Tag,Row,Col,Button,Popconfirm } from 'antd'
-import { errorModal, getLocalData, Request } from '../../../component/service/axios-service';
+import { errorModal, getLocalData, Request, successMessage } from '../../../component/service/axios-service';
 import BaseList from '../../../component/base-list';
 import { getDictationbyCode } from '../../../component/service/direction-service';
 import { Link } from 'react-router-dom';
+import { checkRight, errorRight } from '../../../component/service/menu-service';
 
 const STATE=[<Tag color="error">未开始</Tag>,<Tag color="success">正在执行</Tag>,<Tag color="default">已结课</Tag>];
 const JONIABLE =[<Tag color="error">否</Tag>,<Tag color="success">是</Tag>]
@@ -13,6 +14,9 @@ const SIGHTYPE = ["",<Tag color="error">限时签到</Tag>,<Tag color="success">
 class ClassDescribe extends React.Component {
   constructor(props) {
     super(props);
+    if(!checkRight('getDescribeClass')) {
+      errorRight();
+    }
     this.state={
       'list':[],
       'success':false,
@@ -26,7 +30,6 @@ class ClassDescribe extends React.Component {
         'list':data || [],
         'success':true
       });
-      console.log('all user',this.state.list);
     })
   }
 
@@ -46,33 +49,32 @@ class ClassDescribe extends React.Component {
         data.joinable = data.joinable==2?true:false;  
         this.setState({
           'avatar':data.image,
+          'isend':!((checkRight('editDescribeAllClass') ||(checkRight('editDescribeCreatedClass') && JSON.parse(window.sessionStorage.getItem('user'))['userName']===data.teacherName)))
         });
         if(data.coursestate==2) {
           this.setState({
             'isend':true
           })
+          errorModal("班课已结束，你无法再对班课进行修改");
         }
-        errorModal("班课已结束，你无法再对班课进行修改");
       }
-      console.log('getcoursedetail',this.state);
       this.setState({
         'current':e.key,
         'list':data || [],
         'success':true
       });
+
     })
   }
 
   getMajor = (schoolKey)=>{
     getDictationbyCode('school').map((i)=>{
-      console.log(i);
       if(i.itemKey==schoolKey) {
         Request('GET','/ajax/dictionary/dictionarydetailbypid/'+i.dictionaryDetailId).then((response)=>{
           const {data}=response.data;     
           this.setState({
             'majorlist':data,
           });
-          console.log(this.state.majorlist);
         });
       }
     })
@@ -137,18 +139,16 @@ class ClassDescribe extends React.Component {
   let res;
   reader.onloadend = function(e) {
     res=e.target.result;
-    // console.log(e.target.result);// 打印图片的base64
     if (e && e.target && e.target.result) {
       option.onSuccess();
     }
   };
   this.setState('avatar',res);
-  console.log('avatar',this.state.avatar);
 }
  beforeUpload(file) {
   const isLt2M = file.size / 1024 / 1024 < 2;
   if (!isLt2M) {
-    message.error('不能超过 2MB!');
+    errorModal('添加失败','不能超过2MB！');
   }
   return isLt2M;
 }
@@ -157,9 +157,13 @@ class ClassDescribe extends React.Component {
   e.isschoolclass=e.isschoolclass?2:1;
   e.coursestate = e.coursestate?2:1;
   e['image']=this.state.avatar;
-  console.log('res',e);
+  if(e.coursestate==2) {
+    this.setState({
+      'isend':true
+    });
+  }
   Request('POST','/ajax/updateclass',JSON.stringify(e)).then((response)=>{
-    console.log(response);
+    successMessage('班课信息修改成功');
   })
 }
   render() {
@@ -170,17 +174,19 @@ class ClassDescribe extends React.Component {
       title:'姓名',key:'studentname',dataIndex:'studentname',
   },{
       title:'经验值',key:'totalExp',dataIndex:'totalExp'
-  },{
-      title:'',key:'options',
-      render:(e)=>{return this.renderOption(e)}
-  }];
+  }
+  // ,{
+  //     title:'',key:'options',
+  //     render:(e)=>{return this.renderOption(e)}
+  // }
+];
 
     const signcolumns = [{
       title:'开始时间',key:'begtime',dataIndex:'begtime',
-      render:(val)=>{const data=new Date(val);return data.toLocaleDateString()+" "+data.toLocaleTimeString()}
+      render:(val)=>{const data=new Date(val);return data.toLocaleDateString()+" "+data.toLocaleTimeString();}
   },{
       title:'结束时间',key:'endtime',dataIndex:'endtime',
-      render:(val)=>{const data=new Date(val);return data.toLocaleDateString()+" "+data.toLocaleTimeString()}
+      render:(val)=>{const data=new Date(val);return data.toLocaleDateString()+" "+data.toLocaleTimeString();}
   },{
       title:'学生数量',key:'allstudentnum',dataIndex:'allstudentnum'
   },{
@@ -193,14 +199,14 @@ class ClassDescribe extends React.Component {
     return (
     <MyLayout>
       {this.state.success?
-      <Layout>
+      <Layout style={{margin:'10px 24px'}}>
         <Breadcrumb>
           <Breadcrumb.Item>
             <a href="/class">班课列表</a>
           </Breadcrumb.Item>
           <Breadcrumb.Item>班课详情</Breadcrumb.Item>
         </Breadcrumb>
-        <Menu mode="horizontal" onClick={this.onChagneMode} selectedKeys={[current]}>
+        <Menu style={{margin:'10px 0px'}} mode="horizontal" onClick={this.onChagneMode} selectedKeys={[current]}>
           <Menu.Item key="studentList">
             学生列表
           </Menu.Item>
@@ -252,7 +258,7 @@ class ClassDescribe extends React.Component {
               </Form.Item>
                开课学院
               <Form.Item name="coursemajor" initialValue={this.state.list.coursemajor}  rules={[{ required: true, message: '请选择开课学院' }]} >
-                <Select disabled={this.state.isend} onClick={()=>{console.log(this.state.majorlist);}} onChange={(e)=>{ console.log(e); }}>
+                <Select disabled={this.state.isend}>
                   {
                     this.state.majorlist.length==0?<Select.Option key={0} value={0}>未知</Select.Option>:this.state.majorlist.map((i)=>{
                       return <Select.Option key={i.itemKey} value={i.itemKey}>{i.itemValue}</Select.Option>
@@ -297,8 +303,8 @@ class ClassDescribe extends React.Component {
                 </Col>
                 <Col style={{marginLeft:'24px'}}>
                   是否已结课
-                  <Form.Item name="coursestate"  initialValue={this.state.isend} >
-                    <Switch disabled={this.state.isend} defaultChecked={this.state.isend} />
+                  <Form.Item name="coursestate"  initialValue={this.state.list.coursestate==2} >
+                    <Switch disabled={this.state.isend} defaultChecked={this.state.list.coursestate==2} />
                   </Form.Item>
                 </Col>
               </Row>
