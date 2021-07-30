@@ -19,6 +19,9 @@ import CreatedClass from './pages/list/class-list/created-class';
 import MenuEdit from './pages/menu-edit/list';
 import ForgetPassword from './pages/passport/forget-password';
 import ChangePassword from './pages/me/change-password';
+import Status404 from './pages/status/status-40x';
+import Status50x from './pages/status/status-50x';
+import OthersError from './pages/status/others-error';
 
 function App() {
   return (
@@ -43,6 +46,9 @@ function App() {
           <Route path="/menu-edit" component={MenuEdit} />
           <Route path="/right-edit" component={RightEdit} />
           <Route path="/test" component={MyTest} />
+          <Route path="/status-404" component={Status404} />
+          <Route path="/status-50x" component={Status50x} />
+          <Route path="/others-error" component={OthersError} />
           <Redirect path="/class" exact to="/class/joined-list" />
           <Redirect from="/" exact to="/login" />
         </Switch>

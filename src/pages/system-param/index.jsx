@@ -7,14 +7,16 @@ import { checkRight, errorRight } from '../../component/service/menu-service';
 class SystemParam extends React.Component {
   constructor(props) {
     super(props);
-    if(!checkRight('getSysparam')) {
-      errorRight();
-    }
+    
     this.state={
       'list':[]
     };
   }
-
+  componentWillMount() {
+    if(!checkRight('getSysparam')) {
+      errorRight();
+    }
+  }
   render() {
     return (
     <MyLayout>

@@ -35,7 +35,7 @@ import { errorModal, Request } from './axios-service';
       'dictation':'getDictation',
       'dictation:edit':'editDictation',
       'system-param':'getSysparam',
-      'sysparam:edit':'editSysparam'
+      'sysparam-edit':'editSysparam'
 
   };
   
@@ -71,7 +71,7 @@ import { errorModal, Request } from './axios-service';
     if(list==null || list.length==0) return [];
     let res={};
     for(let i=0;i<list.length;++i) { 
-        const s=RoleMenu[list[i].path];
+        const s=RoleMenu[list[i].name];
         if(s!=undefined && s!=null) {
             res[s]=true;
         }
@@ -81,8 +81,8 @@ import { errorModal, Request } from './axios-service';
 }
 
   export  function errorRight() {
-    errorModal('你没有这个权限，请联系管理员');
-    window.history.back();
+    errorModal('访问失败','你没有这个权限，请联系管理员',()=>window.history.back());
+    
   }
   
   export async function getMenu(id) {  
@@ -94,7 +94,7 @@ import { errorModal, Request } from './axios-service';
           Request('GET','/ajax/menu/getMenuByRoleId/'+id).then( async (response)=>{
                 let {data}=response.data;
                 for(let i=0;i<data.length;++i) {
-                    data[i].url="/"+data[i].path;
+                    data[i].url="/"+data[i].name;
                 }
                 const right=getRoleMenuPath(data);
                 window.sessionStorage.setItem('right',JSON.stringify(right));

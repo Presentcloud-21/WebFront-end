@@ -14,7 +14,8 @@ class Me extends React.Component {
     this.state={
         'user':user,
         'majorlist':[],
-        'avatar':user.avatar || getDefaultUserAvatar()
+        'avatar':user.avatar || getDefaultUserAvatar(),
+        'selected_major':user.depart
     };
     
     this.getMajor(this.state.user.userschool);
@@ -22,6 +23,7 @@ class Me extends React.Component {
   }
   onSave = (e) =>{
     e['avatar']=this.state.avatar;
+    e['depart']=this.state.selected_major;
     e.birthyear=e.birthyear.add(+5,'day')
     console.log('update',e);
     Request('POST','/ajax/updateusermessage',JSON.stringify(e)).then((response)=>{
@@ -62,6 +64,11 @@ class Me extends React.Component {
       );
     }
   };
+  onSelectMajor = (e)=>{
+    this.setState({
+      'selected_major':e
+    })
+  }
 
  customRequest=(option)=> {
   const formData = new FormData();
@@ -109,8 +116,8 @@ class Me extends React.Component {
                     <Input className="me-input" />  
                   </Item>
                   学校
-                  <Item name="userschool" initialValue={this.state.user.userschool} style={{width:'100%'}}> 
-                    <Select  onChange={this.getMajor} >
+                  <Item  name="userschool" initialValue={this.state.user.userschool} style={{width:200}}> 
+                    <Select  onChange={(e)=>{this.getMajor(e);this.setState({'selected_major':0})}} >
                       {
                         getDictationbyCode('school').map((i)=>{
                           return <Select.Option key={i.itemKey} value={i.itemKey}>{i.itemValue}</Select.Option>
@@ -119,15 +126,16 @@ class Me extends React.Component {
                     </Select>
                   </Item>
                   学院
-                  <Item name="depart" initialValue={this.state.user.depart}> 
-                    <Select>
+                  {/* <Item name="depart" style={{width:200}}>  */}
+                    <Select onChange={this.onSelectMajor} style={{width:200}} placeholder="选择学院" value={this.state.selected_major}>
+                      <Select.Option key={0} value={0}>未知</Select.Option>
                       {
-                        this.state.majorlist.length==0?<Select.Option key={0} value={0}>未知</Select.Option>:this.state.majorlist.map((i)=>{
+                        this.state.majorlist.map((i)=>{
                           return <Select.Option key={i.itemKey} value={i.itemKey}>{i.itemValue}</Select.Option>
                         })
                       }
                     </Select>
-                  </Item>
+                  {/* </Item> */}
                   学号            
                   <Item name="perid" initialValue={this.state.user.perid}>
                     <Input className="me-input" />  

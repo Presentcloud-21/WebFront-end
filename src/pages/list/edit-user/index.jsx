@@ -10,24 +10,29 @@ const {Item} = Form;
 class EditUser extends React.Component {
   constructor(props) {
     super(props);
-    if(!checkRight('editUser')){
-      errorRight();
-    }
+    
     this.state={
         'user':{},
         'majorlist':[],
-        'success':false
+        'success':false,
+        'selected_major':0
     };
     const tel=window.sessionStorage.editUser;
     Request('GET','/ajax/getusermessage/'+tel).then((response)=>{
       const{data} = response.data;
       this.setState({
         'user':data,
-        'success':true
+        'success':true,
+        'selected_major':data.depart
       });
       this.getMajor(data.userschool);
     })
     
+  }
+  componentWillMount() {
+    if(!checkRight('editUser')){
+      errorRight();
+    }
   }
   
   getMajor = (schoolKey)=>{
@@ -45,6 +50,7 @@ class EditUser extends React.Component {
   }
   onSave = (e) =>{
     e.birthyear=e.birthyear.add(+5,'day');
+    e['depart']=this.state.selected_major;
     Request('POST','/ajax/updateusermessage',JSON.stringify(e)).then((response)=>{
       if(e.tel===getLocalData('user').tel) {
         window.sessionStorage.setItem('user',JSON.stringify(e));
@@ -54,7 +60,11 @@ class EditUser extends React.Component {
       window.location.href="/user"
     })
   }
-
+  onSelectMajor = (e)=>{
+    this.setState({
+      'selected_major':e
+    })
+  }
 
   render() {
     return (
@@ -90,7 +100,7 @@ class EditUser extends React.Component {
                     </Item>
                     学校
                     <Item name="userschool" initialValue={this.state.user.userschool} style={{width:'100%'}}> 
-                      <Select  onChange={this.getMajor} >
+                      <Select  onChange={(e)=>{this.getMajor(e);this.setState({'selected_major':0})}} >
                         {
                           getDictationbyCode('school').map((i)=>{
                             return <Select.Option key={i.itemKey} value={i.itemKey}>{i.itemValue}</Select.Option>
@@ -99,15 +109,16 @@ class EditUser extends React.Component {
                       </Select>
                     </Item>
                     学院
-                    <Item name="depart" initialValue={this.state.user.depart}> 
-                      <Select>
+                    {/* <Item name="depart" initialValue={this.state.user.depart}>  */}
+                      <Select onChange={this.onSelectMajor} value={this.state.selected_major}>
+                        <Select.Option key={0} value={0}>未知</Select.Option>
                         {
-                          this.state.majorlist.length==0?<Select.Option key={0} value={0}>未知</Select.Option>:this.state.majorlist.map((i)=>{
+                          this.state.majorlist.map((i)=>{
                             return <Select.Option key={i.itemKey} value={i.itemKey}>{i.itemValue}</Select.Option>
                           })
                         }
                       </Select>
-                    </Item>
+                    {/* </Item> */}
                     学号            
                     <Item name="perid" initialValue={this.state.user.perid}>
                       <Input className="me-input" />  

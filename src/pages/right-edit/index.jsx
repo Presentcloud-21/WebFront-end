@@ -6,7 +6,7 @@ import { getLocalData, Request, successMessage } from '../../component/service/a
 import { getMenu, getRoleMenuId, getRoleMenuMap } from '../../component/service/menu-service';
 
 
-
+const initList=[47];
 class RightEdit extends React.Component {
   constructor(props) {
     super(props);
@@ -24,6 +24,7 @@ class RightEdit extends React.Component {
       'type':'add',
       'added':new Map(),
       'deleted':new Map(),
+      'read_only':false,
       'id_to_name':new Map()
     }
     Request('GET','/ajax/menu/getAllMenu').then((response)=>{
@@ -78,7 +79,7 @@ class RightEdit extends React.Component {
               }
               map.set(e.target.value,e.target.checked);
               this.setState({'map':map,'added':added,'deleted':deleted});
-          }} disabled={(i.title==="菜单管理"||i.title==="权限管理"||(i.parentId!=0&&this.state.map.get(i.parentId)!=true))?true:false} value={i.menuId}>{i.title}</Checkbox></Row>
+          }} disabled={(i.title==="菜单管理"||i.title==="权限管理"||i.title==='首页'||(i.parentId!=0&&this.state.map.get(i.parentId)!=true))?true:false} value={i.menuId}>{i.title}</Checkbox></Row>
             <div style={{marginLeft:'30px'}}>
               {
                 // this.state.map.get(i.menuId)==true?
@@ -171,6 +172,7 @@ class RightEdit extends React.Component {
   }
 
   onModal(title){
+    const {read_only}=this.state;
     const {modal}=this.state;
     const {RoleMenus}=this.state;
     return <Modal footer={null} onCancel={()=>{this.setState({'visible':false,'modal':null})}} destroyOnClose title={title} visible={this.state.visible}>
@@ -179,27 +181,33 @@ class RightEdit extends React.Component {
         >
           角色名称
           <Row>
-          <Form.Item name="roleDes" initialValue={modal==null?null:modal.roleDes} rules={[{ required: true, message: '角色名称不能为空' }]}  >
-            <Input className="direction-input" />
+          <Form.Item name="roleDes" initialValue={modal==null?null:modal.roleDes}  rules={[{ required: true, message: '角色名称不能为空' }]}  >
+            <Input disabled={read_only} className="direction-input" />
           </Form.Item>
           </Row>
           角色关键字
           <Row>
           <Form.Item name="roleName" initialValue={modal==null?null:modal.roleName}  rules={[{ required: true, message: '字典关键字不能为空' }]} >
-            <Input className="direction-input" />
+            <Input disabled={read_only} className="direction-input" />
           </Form.Item>
           </Row>
           角色权限
-          <Form.Item initialValue={RoleMenus==null?[]:RoleMenus} name="right">
-            <Checkbox.Group >
+          <Form.Item initialValue={RoleMenus==null||RoleMenus.length==0?initList:RoleMenus} name="right">
+            <Checkbox.Group disabled={read_only} >
               {
                this.onShowMenuRight(this.state.menus)
               }
             </Checkbox.Group>
           </Form.Item>
           <Form.Item name="roleId" initialValue={modal==null?null:modal.roleId} />
-          <Button type="primary" htmlType="submit">提交</Button>
-          <Button type="danger" className="modal_cancel" onClick={()=>{this.setState({'visible':false,'modal':null})}}>取消</Button>
+          {
+            read_only?null:
+            <div>
+              <Button type="primary" htmlType="submit">提交</Button>
+              <Button type="danger" className="modal_cancel" onClick={()=>{this.setState({'visible':false,'modal':null})}}>取消</Button>
+            </div>
+          }
+          
         </Form>
     </Modal>
   }
@@ -216,7 +224,12 @@ class RightEdit extends React.Component {
       return(
         <Row>
           <Col>
-            <Button type="link" onClick={()=>{this.setState({'type':'edit','added':new Map(),'deleted':new Map(),'modal':e,'title':'编辑角色'});this.onEdit(e.roleId)}} >编辑</Button>
+          {
+            e.roleDes==='管理员' || e.roleDes==='学生' || e.roleDes==='教师'?
+            <Button type="link" onClick={()=>{this.setState({'type':'edit','added':new Map(),'read_only':true,'deleted':new Map(),'modal':e,'title':'查看角色'});this.onEdit(e.roleId)}} >查看</Button>
+            :
+            <Button type="link" onClick={()=>{this.setState({'type':'edit','added':new Map(),'read_only':false,'deleted':new Map(),'modal':e,'title':'编辑角色'});this.onEdit(e.roleId)}} >编辑</Button>
+          }
           </Col>
           {
             e.roleDes==='管理员' || e.roleDes==='学生' || e.roleDes==='教师'?null:
@@ -249,7 +262,7 @@ class RightEdit extends React.Component {
         <Layout>
           {this.onModal(this.state.title)}
         <Row>
-          <Button type="primary" onClick={()=>{this.setState({'type':'add','modal':null,'RoleMenus':[],'map':new Map(),'visible':true})}}>添加用户</Button>
+          <Button type="primary" onClick={()=>{this.setState({'type':'add','read_only':false,'modal':null,'RoleMenus':[],'map':new Map(),'visible':true})}}>添加用户</Button>
         </Row>
         <Row>
           <BaseList list={this.state.list} columns={columns} isSelection={false}  />

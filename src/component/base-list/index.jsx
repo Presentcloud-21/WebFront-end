@@ -25,7 +25,8 @@ class BaseList extends React.Component {
       'selectedCallback':props.selectedCallback,
       'expandable':props.expandable,
       'pagination':props.pagination && true,
-      'bordered':props.bordered || false
+      'bordered':props.bordered || false,
+      'onChange':props.onChange
     };
   }
   componentWillReceiveProps(props) {
@@ -39,7 +40,8 @@ class BaseList extends React.Component {
       'selectedCallback':props.selectedCallback,
       'expandable':props.expandable,
       'pagination':props.pagination && true,
-      'bordered':props.bordered || false
+      'bordered':props.bordered || false,
+      'onChange':props.onChange
     });
   }
   onSelectChange = (selectedRowKey)=>{
@@ -64,6 +66,7 @@ class BaseList extends React.Component {
         dataSource={this.state.list} 
         expandable={this.state.expandable}
         bordered={this.state.bordered}
+        onChange={this.state.onChange}
         // render={(val)=>{console.log('new val',val);}}
         />
       </Layout>

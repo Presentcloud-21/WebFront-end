@@ -82,9 +82,9 @@ class SignUp extends  React.Component {
           onFinishFailed={this.onFinishFail}
         >
           <Item name='roleId'>
-              <Radio.Group  defaultValue={13}>
-                <Radio value={13} style={{color:'white'}}>学生注册</Radio>
-                <Radio value={14} style={{color:'white'}}>教师注册</Radio>
+              <Radio.Group  defaultValue={2}>
+                <Radio value={2} style={{color:'white'}}>学生注册</Radio>
+                <Radio value={1} style={{color:'white'}}>教师注册</Radio>
               </Radio.Group>
           </Item>
           <Item name="userName" rules={[{ required: true, message: '请输入用户名' }]}>

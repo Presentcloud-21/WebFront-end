@@ -21,9 +21,10 @@ class ClassList extends React.Component {
       'hasDeleted':props.hasDeleted || false,
       'created':checkRight('getCreatedClass'),
       'all':checkRight('getAllClass'),
-      'deleteCreatedClass':checkRight('deleteCreatedClass'),
       'deleteAllClass':checkRight('deleteAllClass'),
-      'creatable':checkRight('createClass')
+      'creatable':checkRight('createClass'),
+      'sortedInfo':{'columnKey':'','order':''}
+      
     }
   }
   componentWillReceiveProps(props) {
@@ -36,7 +37,6 @@ class ClassList extends React.Component {
       'hasDeleted':props.hasDeleted || false,
       'created':checkRight('getCreatedClass'),
       'all':checkRight('getAllClass'),
-      'deleteCreatedClass':checkRight('deleteCreatedClass'),
       'deleteAllClass':checkRight('deleteAllClass'),
       'creatable':checkRight('createClass')
 
@@ -64,12 +64,13 @@ class ClassList extends React.Component {
       'selectedRowKey':data
     })
   }
+  
 
   renderOption  = (e) => {
     return(
       <Row>
         {
-          (this.state.deleteAllClass)||(this.state.deleteCreatedClass&&e.userId==JSON.parse(window.sessionStorage.user)['userId'])?
+          (this.state.deleteAllClass)||(e.teacherName==JSON.parse(window.sessionStorage.user)['userName'])?
           <Col>
         <Popconfirm  
           title="是否确认删除该数据？"
@@ -95,11 +96,20 @@ class ClassList extends React.Component {
       </Row>
       );
   }
+  handleChange = (pagination, filters, sorter) => {
+    console.log('Various parameters', pagination, filters, sorter);
+    this.setState({
+      filteredInfo: filters,
+      sortedInfo: sorter,
+    });
+  };
 
   render() {
     const {current}=this.state;
+    const {sortedInfo}=this.state;
     const columns = [{
       title:'课程编号',key:'courseId',dataIndex:'courseId',
+      sorter:(a,b)=>{return a.courseId-b.courseId},
       render:(id)=>{return <Button type="link" onClick={()=>{
         window.sessionStorage.setItem('desClass',id);
       }}> <Link to="/class/class-describe">{id}</Link></Button>}
@@ -109,15 +119,22 @@ class ClassList extends React.Component {
       title:'创建者',key:'teacherName',dataIndex:'teacherName'
   },{
       title:'学校',key:'school',dataIndex:'courseschool',
+      sorter:(a,b)=>{return a.courseschool-b.courseschool},
   },{
       title:'专业',key:'major',dataIndex:'coursemajor',
+      // sorter:(a,b)=>{return a.coursemajor-b.coursemajor},
+
   },{
       title:'开课学期',key:'term',dataIndex:'term',
+      // sorter:(a,b)=>{return a.term-b.term},
+
   },{
       title:'可加入',key:'joinable',dataIndex:'joinable',
+      // sorter:(a,b)=>{return a.joinable-b.joinable},
       render:(status)=>{return JONIABLE[status]}
   },{
       title:'课程状态',key:'coursestate',dataIndex:'coursestate',
+      // sorter:(a,b)=>{return a.coursestate-b.coursestate},
       render:(status)=>{return STATE[status]}
   },{
       title:'',key:'options',

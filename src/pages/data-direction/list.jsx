@@ -19,6 +19,7 @@ class List extends React.Component {
       'list':[],
       'transform':new Map(),
       'editable':checkRight('editDictation'),
+      'sortedInfo':{},
     };
     this.onInit(props);
   }
@@ -276,9 +277,25 @@ class List extends React.Component {
       window.location.reload();
     })
   }
+  setPIDSort = () => {
+    this.setState({
+      sortedInfo: {
+        order: 'descend',
+        columnKey: 'pId',
+      },
+    });
+  };
+  handleChange = (pagination, filters, sorter) => {
+    // console.log('Various parameters', pagination, filters, sorter);
+    this.setState({
+      filteredInfo: filters,
+      sortedInfo: sorter,
+    });
+  };
 
   
   render(){
+    const {sortedInfo} =this.state;
     return (
     
       <Row>
@@ -290,14 +307,14 @@ class List extends React.Component {
             this.state.editable?<Button type="primary" onClick={this.onAddDirectionData} className="add-direcetion">新增字典明细</Button>:null
           }
         <Col>
-          <Table  bordered pagination={false} className="direction-table" dataSource={this.state.list}  scroll={{ y: 300 }}>
-            <Column title="数据编号" key="key" dataIndex="itemKey" />
+          <Table onChange={this.handleChange}  bordered pagination={false} className="direction-table" dataSource={this.state.list}  scroll={{ y: 300 }}>
+            <Column title="数据编号" sorter={(a,b)=>{ return a.itemKey-b.itemKey}} sortOrder={sortedInfo.columnKey === 'key' && sortedInfo.order} key="key" dataIndex="itemKey" />
             <Column title="数据名称" key="name" dataIndex="itemValue"/>
             {/* <Column title="关键字" key="keyname" dataIndex="dictionaryCode"/> */}
-            <Column title="默认值" key="default" dataIndex="isdefault" render={ (value)=>{ return ISDEFAULT[value]} }/>
+            <Column title="默认值" sorter={(a,b)=>{ return a.isdefault-b.isdefault}} sortOrder={sortedInfo.columnKey === 'default' && sortedInfo.order} key="default" dataIndex="isdefault" render={ (value)=>{ return ISDEFAULT[value]} }/>
             {
               this.state.pId == 0?null:
-              <Column title="所属" key="detailpId" dataIndex="detailpId"
+              <Column title="所属" sorter={(a,b)=>{ return a.detailpId-b.detailpId}} sortOrder={sortedInfo.columnKey === 'detailpId' && sortedInfo.order} key="detailpId" ellipsis={true} dataIndex="detailpId"
               render={(value)=>{return this.state.transform.get(value)}} 
               />
             }

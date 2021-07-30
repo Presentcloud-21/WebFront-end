@@ -13,9 +13,7 @@ const { Item } = Menu;
 class DataDirection extends React.Component {
   constructor(props) {
     super(props);
-    if(!checkRight('getDictation')) {
-      errorRight();
-    }
+    
     this.state={
       'selected_key':0,
       'selected_code':'',
@@ -29,6 +27,11 @@ class DataDirection extends React.Component {
         'list':data
       });
     });
+  }
+  componentWillMount() {
+    if(!checkRight('getDictation')) {
+      errorRight();
+    }
   }
   
   componentDidUpdate() {

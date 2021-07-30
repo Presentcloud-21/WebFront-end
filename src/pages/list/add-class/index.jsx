@@ -10,9 +10,7 @@ const {Item} = Form;
 class AddClass extends React.Component {
   constructor(props) {
     super(props);
-    if(!checkRight('createClass')) {
-      errorRight();
-    }
+   
     const user=window.sessionStorage.user;
     this.state={
         'user':JSON.parse(user),
@@ -20,7 +18,11 @@ class AddClass extends React.Component {
         'avatar':getDefaultClassAvatar()
     };
   }
-  
+  componentWillMount() {
+    if(!checkRight('createClass')) {
+      errorRight();
+    }
+  }
   getMajor = (schoolKey)=>{
     getDictationbyCode('school').map((i)=>{
       if(i.itemKey==schoolKey) {

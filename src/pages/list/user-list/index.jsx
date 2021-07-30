@@ -27,12 +27,13 @@ class UserList extends React.Component {
     }
     
     renderButton = () => {
-        return(
-            this.state.deleteable?
-            <Button.Group style={{marginLeft:'auto'}}>
-                <Button type="danger" style={{margin:'0px 24px'}}>批量删除</Button>
-            </Button.Group>:null
-        )
+        return null;
+        // return(
+        //     this.state.deleteable?
+        //     <Button.Group style={{marginLeft:'auto'}}>
+        //         <Button type="danger" style={{margin:'0px 24px'}}>批量删除</Button>
+        //     </Button.Group>:null
+        // )
     }
     selectedCallback(data){
       this.setState({

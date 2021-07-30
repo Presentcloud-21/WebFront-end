@@ -6,6 +6,7 @@ import BaseList from '../../../component/base-list';
 import { getDictationbyCode } from '../../../component/service/direction-service';
 import { Link } from 'react-router-dom';
 import { checkRight, errorRight } from '../../../component/service/menu-service';
+import { getDefaultClassAvatar } from '../../../component/service/default';
 
 const STATE=[<Tag color="error">未开始</Tag>,<Tag color="success">正在执行</Tag>,<Tag color="default">已结课</Tag>];
 const JONIABLE =[<Tag color="error">否</Tag>,<Tag color="success">是</Tag>]
@@ -14,15 +15,13 @@ const SIGHTYPE = ["",<Tag color="error">限时签到</Tag>,<Tag color="success">
 class ClassDescribe extends React.Component {
   constructor(props) {
     super(props);
-    if(!checkRight('getDescribeClass')) {
-      errorRight();
-    }
     this.state={
       'list':[],
       'success':false,
       'majorlist':[],
       'current':'studentList',
-      "isend":false
+      "isend":false,
+      
     }
     Request('GET','/ajax/memberList/'+getLocalData('desClass')).then((response)=> {
       const {data} = response.data;
@@ -31,6 +30,11 @@ class ClassDescribe extends React.Component {
         'success':true
       });
     })
+  }
+  componentWillMount(){
+    if(!checkRight('getDescribeClass')) {
+      errorRight();
+    }
   }
 
   onChagneMode =(e) => {
@@ -48,8 +52,8 @@ class ClassDescribe extends React.Component {
         data.isschoolclass=data.isschoolclass==2?true:false;
         data.joinable = data.joinable==2?true:false;  
         this.setState({
-          'avatar':data.image,
-          'isend':!((checkRight('editDescribeAllClass') ||(checkRight('editDescribeCreatedClass') && JSON.parse(window.sessionStorage.getItem('user'))['userName']===data.teacherName)))
+          'avatar':data.image || getDefaultClassAvatar(),
+          'isend':!((checkRight('editDescribeAllClass') ||JSON.parse(window.sessionStorage.getItem('user'))['userName']===data.teacherName))
         });
         if(data.coursestate==2) {
           this.setState({

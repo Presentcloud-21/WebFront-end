@@ -25,13 +25,17 @@ class MenuEdit extends React.Component {
   renderOption  = (text,record,index) => {
     return(
       <Row>
-          <Button type="link" onClick={()=>{this.onAddMenus(record.menuId);}}>
+          {/* <Button type="link" onClick={()=>{this.onAddMenus(record.menuId);}}>
               添加
-            </Button>
-          <Button type="link" onClick={()=>{this.onEditMenu(record);}}>
+            </Button> */}
+            {
+              record.menutype==1?
+              <Button type="link" onClick={()=>{this.onEditMenu(record);}}>
               编辑
             </Button>
-        <Popconfirm  
+            :null
+            }
+        {/* <Popconfirm  
           title="是否确认删除该数据？"
           okText="删除"
           cancelText="取消"
@@ -39,7 +43,7 @@ class MenuEdit extends React.Component {
           this.onDeleteMenu(record.menuId);
         }}>
           <Button type="link">删除</Button>
-          </Popconfirm>
+          </Popconfirm> */}
       </Row>
       
       );
@@ -163,6 +167,7 @@ class MenuEdit extends React.Component {
             'list':data || []
           });
         });
+        window.location.reload();
       }
     });
     callback();
@@ -198,7 +203,7 @@ class MenuEdit extends React.Component {
           <Form.Item name="icon" initialValue={data.icon}> 
             {this.onGetIcon()}
           </Form.Item>
-          {
+          {/* {
             data.menutype==1?<Form.Item name='menutype' initialValue={1} />:
             <div>
               <p>类型</p>
@@ -212,17 +217,20 @@ class MenuEdit extends React.Component {
                 </Select>
               </Form.Item>
             </div>
-          }
+          } */}
           <Button type="primary" onClick={()=>{}} htmlType="submit">提交</Button>
           <Button type="danger" onClick={()=>{modal.destroy()}}>取消</Button>
+          <Form.Item name='menutype' initialValue={data.menutype} />
           <Form.Item name='menuId' initialValue={data.menuId} />
-          <p>path</p><Form.Item name='path' initialValue={data.path} >
-            <Input />
-          </Form.Item>
-          <p>name</p>
+          {/* <p>name</p> */}
           <Form.Item name='name' initialValue={data.name} >
-            <Input />
+            {/* <Input /> */}
           </Form.Item>
+          {/* <p>path</p> */}
+          <Form.Item name='path' initialValue={data.path} >
+            {/* <Input /> */}
+          </Form.Item>
+          
           <Form.Item name='parentId' initialValue={data.parentId} />
           <Form.Item name='menuType' initialValue={data.menuType} >
             {/* <Select>
@@ -259,12 +267,10 @@ class MenuEdit extends React.Component {
     const columns = [{
       title:'名称',key:'title',dataIndex:'title'
   },{
-      title:'路径',key:'path',dataIndex:'path'
-  },{
       title:'类型',key:'menutype',dataIndex:'menutype',
       render:val=>{return TYPE[val]}
   },{
-      title:'标志',key:'icon',dataIndex:'icon',
+      title:'图标',key:'icon',dataIndex:'icon',
       render:(val)=>{return getIcon(val);}
   },{
       title:'',key:'options',dataIndex:'',
@@ -273,8 +279,6 @@ class MenuEdit extends React.Component {
     const onBuildTable=(list)=>{
       const columns = [{
         title:'名称',key:'title',dataIndex:'title'
-    },{
-        title:'路径',key:'path',dataIndex:'path'
     },{
         title:'类型',key:'menutype',dataIndex:'menutype',
         render:val=>{return TYPE[val]}
